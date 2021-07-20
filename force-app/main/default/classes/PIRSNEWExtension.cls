@@ -33,22 +33,7 @@ public without sharing class PIRSNEWExtension {
           system.debug('####### corr.Contact : ' + corr.ContactId);                  
           system.debug('####### corr.Account : ' + corr.AccountId);          
         }
-        // Check attachment sizes BEFORE saving case
-        //for (Attachment newAtt : newAttachments)
-        //{
-        //    if (newAtt.Body!=null)
-        //    {
-        //        system.debug('####### ATTACHMENT FOUND');
-        //        system.debug('####### ATTACHMENT LENGTH: '  + String.valueof(newAtt.BodyLength));
-        //        // check attachment size
-        //        if(newAtt.BodyLength > 5242880){ 
-        //            system.debug('####### ATTACHMENT TOO BIG');          
-        //            //maximum attachment size is 5MB.  Show an error
-        //            ApexPages.addMessage(new ApexPages.Message(ApexPages.severity.Error, 'Incident NOT submitted as file is too big (' + Decimal.valueOf(newAtt.BodyLength/1048576).setScale(1) + ' MB)')); 
-        //            return null;
-        //        }
-        //    }
-        //}
+
         system.debug('####### BEFORE 1ST SAVE');
         insert corr;
         //ctrl.save();
@@ -61,18 +46,12 @@ public without sharing class PIRSNEWExtension {
         // Attachment stuff here
         //List<Attachment> toInsert=new List<Attachment>();
         system.debug('####### BEFORE ATTACHMENTS');
+        List<ContentVersion> contentVersions = new List<ContentVersion>();
         for (Attachment newAtt : newAttachments)
         {
             if (newAtt.Body!=null)
             {
-                //system.debug('####### SAVING ATTACHMENT');
-                //newAtt.OwnerId = UserInfo.getUserId();
-                //newAtt.parentId=corr.Id;
-                //newAtt.IsPrivate = false;
-                //toInsert.add(newAtt);
-                
-                //Blob b=newAtt.Body;
-                //req1.setBodyAsBlob(b);
+
                 string fileString=EncodingUtil.Base64Encode(newAtt.Body);     
  
                 ContentVersion conVer = new ContentVersion();
@@ -80,37 +59,33 @@ public without sharing class PIRSNEWExtension {
                 conVer.PathOnClient = newAtt.Name; // The files name, extension is very important here which will help the file in preview.
                 conVer.Title = newAtt.Description; // Display name of the files
                 conVer.VersionData = EncodingUtil.base64Decode(fileString); // converting your binary string to Blob
-                try {
-                    insert conVer;    //Insert ContentVersion
-                }
-                catch(DMLException e) {
-                    ApexPages.addMessage(new ApexPages.message(ApexPages.severity.ERROR,'Error uploading attachment!'));
-                    system.debug('####### FAILED TO SAVE ATTACHMENT');
-                    return null;
-                } 
-                // First get the Content Document Id from ContentVersion Object
-                Id conDoc = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:conVer.Id].ContentDocumentId;
-                //create ContentDocumentLink  record 
-                ContentDocumentLink conDocLink = New ContentDocumentLink();
-                conDocLink.LinkedEntityId = corr.Id; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
-                conDocLink.ContentDocumentId = conDoc;  //ContentDocumentId Id from ContentVersion
-                conDocLink.shareType = 'V';
-                try {
-                    insert conDocLink; 
-                }
-                catch(DMLException e) {
-                    ApexPages.addMessage(new ApexPages.message(ApexPages.severity.ERROR,'Error uploading attachment!'));
-                    system.debug('####### FAILED TO SAVE ATTACHMENT');
-                    return null;
-                }    
+                contentVersions.add(conVer);
             }
         }
-        //try { insert toInsert; }
-        //catch (DMLException e) {
-        //    ApexPages.addMessage(new ApexPages.message(ApexPages.severity.ERROR,'Error uploading attachment!'));
-        //    system.debug('####### FAILED TO SAVE ATTACHMENT');
-        //    return null;
-        //}
+        if (!contentVersions.isEmpty()) {
+          try {
+            insert contentVersions;
+            // get Ids from the newly inserted records
+            Set<Id> contentVersionIds = (new Map<Id, ContentVersion>(contentVersions)).keySet();
+            // list to hold new content document link records
+            List<ContentDocumentLink> contentDocumentLinks = new List<ContentDocumentLink>();
+            for (ContentVersion contentVersion : [SELECT ContentDocumentId FROM ContentVersion WHERE Id IN :contentVersionIds]) {
+              //create ContentDocumentLink  record 
+              ContentDocumentLink conDocLink = New ContentDocumentLink();
+              conDocLink.LinkedEntityId = corr.Id; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
+              conDocLink.ContentDocumentId = contentVersion.ContentDocumentId;  //ContentDocumentId Id from ContentVersion
+              conDocLink.shareType = 'V';
+              contentDocumentLinks.add(conDocLink);
+            }
+            if (!contentDocumentLinks.isEmpty()) {
+              insert contentDocumentLinks;
+            }
+          } catch(DMLException e) {
+              ApexPages.addMessage(new ApexPages.message(ApexPages.severity.ERROR, 'Error uploading attachment!'));
+              return null;
+          }
+        }
+
         newAttachments.clear();
         newAttachments.add(new Attachment());
         system.debug('####### AFTER ATTACHMENTS');

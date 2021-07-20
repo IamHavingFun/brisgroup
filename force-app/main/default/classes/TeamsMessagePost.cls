@@ -1,7 +1,9 @@
 global class TeamsMessagePost {
+
     @InvocableMethod(label='postTeamsMessage' description='Post message to specified Teams channel')
     global static void postTeamsMessage(getParameters[] requests) {
-        for (getParameters request : requests) {
+        if (!requests.isEmpty()) {
+            getParameters request = requests.get(0);
             callWebService(request.teamName, request.postedBy, request.title, request.message, request.url);
         }
     }       
