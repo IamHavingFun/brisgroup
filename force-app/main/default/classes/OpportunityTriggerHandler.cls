@@ -1,23 +1,19 @@
+/**
+ * @author PolSource
+ */
 public with sharing class OpportunityTriggerHandler {
 
+    private OpportunityTriggerHandler() {}
+
+    /**
+     * @param records 
+     */
     public static void updateNoteOnProjects(List<Opportunity> records) {
         String notesRollup = '';
 
-        List<String> projectIds = new List<String>();
-        for (Opportunity o : records) {
-            projectIds.add(o.Project__c);
-        }
+        List<String> projectIds = getAllProjectIds(records);
         Map<String, Opportunity> projects = new Map<String, Opportunity>([SELECT id, Name, Notes__c, Notes_Rollup__c, Record_Type_Name__c FROM Opportunity WHERE Id IN :projectIds]);
-        Map<String, List<Opportunity>> opportunitiesByProject = new Map<String, List<Opportunity>>();
-        for (Opportunity opp : [SELECT Id, Name, Notes__c, Project__c FROM Opportunity WHERE Project__c IN :projectIds]) {
-            if (!opportunitiesByProject.containsKey(opp.Project__c)) {
-                opportunitiesByProject.put(opp.Project__c, new List<Opportunity>{opp});
-            } else {
-                List<Opportunity> opps = opportunitiesByProject.get(opp.Project__c);
-                opps.add(opp);
-                opportunitiesByProject.put(opp.Project__c, opps);
-            }
-        }
+        Map<String, List<Opportunity>> opportunitiesByProject = getOpportunitiesByProjectId(projectIds);
     
         for (Opportunity o : records) {
             String recordType = o.Record_Type_Name__c;
@@ -52,5 +48,27 @@ public with sharing class OpportunityTriggerHandler {
         if (!projects.values().isEmpty()) {
             update projects.values();
         }
+    }
+
+    private static List<String> getAllProjectIds(List<Opportunity> records) {
+        List<String> projectIds = new List<String>();
+        for (Opportunity o : records) {
+            projectIds.add(o.Project__c);
+        }
+        return projectIds;
+    }
+
+    private static Map<String, List<Opportunity>> getOpportunitiesByProjectId(List<String> projectIds) {
+        Map<String, List<Opportunity>> opportunitiesByProject = new Map<String, List<Opportunity>>();
+        for (Opportunity opp : [SELECT Id, Name, Notes__c, Project__c FROM Opportunity WHERE Project__c IN :projectIds]) {
+            if (opportunitiesByProject.containsKey(opp.Project__c)) {
+                List<Opportunity> opps = opportunitiesByProject.get(opp.Project__c);
+                opps.add(opp);
+                opportunitiesByProject.put(opp.Project__c, opps);                
+            } else {
+                opportunitiesByProject.put(opp.Project__c, new List<Opportunity>{opp});
+            }
+        }
+        return opportunitiesByProject;
     }
 }
