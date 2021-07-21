@@ -1,5 +1,13 @@
+/**
+ * @author PolSource
+ */
 public with sharing class AttachmentTriggerHandler {
 
+    private AttachmentTriggerHandler() {}
+
+    /**
+     * @param records given a list of attachment, this method creates ContentDocumentLinks and ContentVersion records
+     */
     public static void createContentVersionAndLinkRecords(List<Attachment> records) {
         List<String> parentIds = new List<String>();
         for (Attachment a : records) {
@@ -23,22 +31,29 @@ public with sharing class AttachmentTriggerHandler {
                 String z = string.valueof(eml.parentID);
                 // Check if email parent is a case, if so reassign attachment to case
                 if (z.substring(0,3) == '500' && eml.Incoming) {
-                    //a.parentid = [select parentID from EmailMessage where id = :a.parentid].parentID;
+
+                    // Converts a Blob to an unencoded String representing its normal form.
                     string fileString = EncodingUtil.Base64Encode(a.Body);
      
                     ContentVersion conVer = new ContentVersion();
-                    conVer.ContentLocation = 'S'; // to use S specify this document is in Salesforce, to use E for external files
-                    conVer.PathOnClient = a.Name; // The files name, extension is very important here which will help the file in preview.
-                    conVer.Title = a.Description; // Display name of the files
-                    conVer.VersionData = EncodingUtil.base64Decode(fileString); // converting your binary string to Blob
+                    // Origin of the document: Document is located within Salesforce. Label is Salesforce.
+                    conVer.ContentLocation = 'S';
+                    // The files name, extension is very important here which will help the file in preview. 
+                    conVer.PathOnClient = a.Name;
+                    // Display name of the files
+                    conVer.Title = a.Description; 
+                    // converting your binary string to Blob
+                    conVer.VersionData = EncodingUtil.base64Decode(fileString);
                     conVer.Description = eml.parentID;
                     contentVersions.add(conVer);
                 }
             }
         }
     
+        // check if any items were added to the list
         if (!contentVersions.isEmpty()) {
             try {
+                // perform DML Operation upon a list of records
                 insert contentVersions;
                 // get Ids from the newly inserted records
                 Set<Id> contentVersionIds = (new Map<Id, ContentVersion>(contentVersions)).keySet();
@@ -46,13 +61,17 @@ public with sharing class AttachmentTriggerHandler {
                 List<ContentDocumentLink> contentDocumentLinks = new List<ContentDocumentLink>();
                 for (ContentVersion conVer : [SELECT ContentDocumentId, Description FROM ContentVersion WHERE Id IN :contentVersionIds]) {
                     ContentDocumentLink conDocLink = New ContentDocumentLink();
-                    conDocLink.LinkedEntityId = conVer.Description; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
-                    conDocLink.ContentDocumentId = conVer.ContentDocumentId;  //ContentDocumentId Id from ContentVersion
+                    // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
+                    conDocLink.LinkedEntityId = conVer.Description; 
+                    //ContentDocumentId Id from ContentVersion
+                    conDocLink.ContentDocumentId = conVer.ContentDocumentId; 
+                    // The permission granted to the user of the shared file in a library: Viewer permission. The user can explicitly view but not edit the shared file.
                     conDocLink.shareType = 'V';
                     contentDocumentLinks.add(conDocLink);
                 }
-        
+                // check if any items were added to the list
                 if (!contentDocumentLinks.isEmpty()) {
+                    // perform DML Operation upon a list of records
                     insert contentDocumentLinks;
                 }            
             } catch (DmlException e) {

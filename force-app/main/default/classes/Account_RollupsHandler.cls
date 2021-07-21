@@ -1,7 +1,6 @@
 /**
  * 
- * @author polsource
- * @since 2021.07.10
+ * @author PolSource
  */
 public with sharing class Account_RollupsHandler {
 
@@ -22,11 +21,15 @@ public with sharing class Account_RollupsHandler {
               contactIds.add(account.PersonContactId);
           }
         }
-        // Maps to hold count of records by account/contact Id
+        // Maps to hold total Order records by account Id
         Map<String, Integer> numberOfOrdersByAccount = getTotalOrdersByAccount(accountIds);
+        // Maps to hold total Warranty records for each Contact Id
         Map<String, Integer> numberOfWarrantiesByContact = getTotalWarrantiesByContact(contactIds);
+        // Maps to hold total Case records for each Contact Id
         Map<String, Integer> numberOfCasesByContact = getTotalCasesByContact(contactIds);
+        // Maps to hold total Call records for each Contact Id
         Map<String, Integer> numberOfCallsByContact = getTotalCallsByContact(contactIds);
+        // Maps to hold total Live Chat records for each Contact Id
         Map<String, Integer> numberOfLiveChatsByContact = getTotalLiveChatsByContact(contactIds);
 
         // Update Account's properties

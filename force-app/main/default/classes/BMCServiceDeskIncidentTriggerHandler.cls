@@ -1,5 +1,13 @@
+/**
+ * @author PolSource
+ */
 public with sharing class BMCServiceDeskIncidentTriggerHandler {
 
+    private BMCServiceDeskIncidentTriggerHandler() {}
+
+    /**
+     * @param records 
+     */
     public static void updateServiceDeskStatus(List<BMCServiceDesk__Incident__c> records) {
         List<String> newStatuses = new List<String>();
         for (BMCServiceDesk__Incident__c inc: records) {
@@ -32,6 +40,9 @@ public with sharing class BMCServiceDeskIncidentTriggerHandler {
         }        
     }
 
+    /**
+     * @param records 
+     */
     public static void updateIncidentStatus(List<BMCServiceDesk__Incident__c> records) {
         List<String> newStatuses = new List<String>();
         for (BMCServiceDesk__Incident__c inc: records) {
@@ -63,19 +74,18 @@ public with sharing class BMCServiceDeskIncidentTriggerHandler {
         }
     }
 
+    /**
+     * @param records 
+     */
     public static void createIncidentShareRecords(List<BMCServiceDesk__Incident__c> records) {
-        Id owner;
         Id managerID;
         Id delegateID;
-        boolean complete = false;
     
         // Create a new list of sharing objects for Job
         List<BMCServiceDesk__Incident__Share> jobShrs  = new List<BMCServiceDesk__Incident__Share>();
     
         for(BMCServiceDesk__Incident__c i: records)
         {
-            // Get owner ID from Incident record
-            owner = i.BMCServiceDesk__FKClient__c;
             managerID = i.RF_Manager__c;
             delegateID = i.RF_Delegated_Approver__c;
     
@@ -102,7 +112,9 @@ public with sharing class BMCServiceDeskIncidentTriggerHandler {
             jobShrs.add(incShrd);        
         }
         if (!jobShrs.isEmpty()) {
-            Database.SaveResult[] lsr = Database.insert(jobShrs,false);
+            // The optional allOrNone parameter specifies whether the operation allows partial success. 
+            // we are setting its value to false so if a record fails, the remainder of the DML operation can still succeed.
+            Database.SaveResult[] lsr = Database.insert(jobShrs, false);
          
             // Create counter
             Integer x=0;
@@ -128,6 +140,9 @@ public with sharing class BMCServiceDeskIncidentTriggerHandler {
         }
     }
 
+    /**
+     * @param records 
+     */
     public static void updateDelegateOnIncidents(List<BMCServiceDesk__Incident__c> records) {
         List<Id> ownerIds = new List<Id>();
         for (BMCServiceDesk__Incident__c i: records) {
