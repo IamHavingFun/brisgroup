@@ -4,5 +4,13 @@
 		<members>*</members>
 		<name>ApexClass</name>
 	</types>
+	<types>
+		<members>*</members>
+		<name>ApexTrigger</name>
+	</types>
+	<types>
+		<members>ECN_Line_Field_to_Change_Product_Map__mdt</members>
+		<name>CustomObject</name>
+	</types>
 	<version>51.0</version>
 </Package>
