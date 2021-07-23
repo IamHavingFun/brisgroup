@@ -10,7 +10,11 @@ private class testOpptyUpdateQuote{
         list<Quote> qu=new list<Quote>();
         TestUtilityClass.setUpData();
         Opportunity opty1 = TestUtilityClass.opp; // Creating opportunity record
-        
+
+        schema.describesobjectresult resultQuote = Quote.sobjecttype.getdescribe();
+        Map<string, schema.recordtypeinfo> qutRecTypeId = resultQuote.getrecordtypeinfosbyname();
+        Id recordType = qutRecTypeId.get('Special Price').getrecordtypeid();
+
         //creating test Quote
        for(Integer x=0; x<200;x++)//testing quotes with bulk update
        {
@@ -20,6 +24,7 @@ private class testOpptyUpdateQuote{
          q.Name='Test Quote';
          q.OpportunityId=opty1.Id;
          q.Expiration_Date__c = date.today().addDays(60);
+         q.RecordTypeId = recordType;
          qu.add(q);
        }
      INSERT qu;//Inserting the quotes

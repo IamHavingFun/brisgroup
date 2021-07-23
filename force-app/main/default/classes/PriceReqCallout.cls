@@ -14,7 +14,8 @@ public class PriceReqCallout{
         Application_Config__c csURL = Application_Config__c.getInstance('QuantityRequestURL');
         string URL = csURL.Value__c;
         req.setEndpoint(URL);
-//        req.setEndpoint('http://185.13.140.5:59080/fndext/soapgateway'); // live address **
+
+//      req.setEndpoint('http://185.13.140.5:59080/fndext/soapgateway'); // live address **
 //      req.setEndpoint('http://185.13.140.5:58080/fndext/soapgateway'); // test address **        
 //      req.setEndpoint('http://185.13.140.5:60080/fndext/soapgateway');// IT1.1
         //set request method type

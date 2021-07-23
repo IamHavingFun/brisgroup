@@ -83,20 +83,21 @@ public class ServiceAppointmentGenerateStartEnd Implements Schedulable {
                         dbpostcode = member.Drop_Box_Postcode__c;   
                         dbcountry = member.Drop_Box_Country__c;        
                         // Create day start appt
-                        createRecords(dtStart, dtStart.addMinutes(15), member.ServiceResourceId, dayStartId, 
+                        addRecords(dtStart, dtStart.addMinutes(15), member.ServiceResourceId, dayStartId,
                             dayStartRecordId, addy1, city, county, postcode, country, 'Y', member.ServiceTerritoryId);
                         // create day end appt
-                        createRecords(dtEnd, dtEnd.addMinutes(15), member.ServiceResourceId, dayEndId, 
+                        addRecords(dtEnd, dtEnd.addMinutes(15), member.ServiceResourceId, dayEndId,
                             dayEndRecordId, addy1, city, county, postcode, country, 'Y', member.ServiceTerritoryId);
                         // Check if dropbox appt is needed
                         String dayOfWeek = dtDropboxStart.format('E');
                         if(dayOfWeek == 'Mon' || dayOfWeek == 'Wed' || dayOfWeek == 'Fri') {
                             // create drop box appt
-                            createRecords(dtDropboxStart, dtDropboxStart.addMinutes(10), member.ServiceResourceId, dropboxId, 
+                            addRecords(dtDropboxStart, dtDropboxStart.addMinutes(10), member.ServiceResourceId, dropboxId,
                                 dropboxRecordId, dbaddy1, dbcity, dbcounty, dbpostcode, dbcountry, '', member.ServiceTerritoryId);
                         }
                     }
-                }        
+                }
+                initCreateRecords(workOrders);
             }
             else {
                 system.debug('******NO TERRITORY MEMBERS FOUND');
@@ -106,10 +107,66 @@ public class ServiceAppointmentGenerateStartEnd Implements Schedulable {
             system.debug('******ERROR GENERATING DAY START/ENDS: ' + e);
             return;
         }
-    }  
+    }
+
+    List<String> workOrders = new List<String>();
+    public void addRecords(Datetime t_startDate, Datetime t_endDate, String t_resourceId,
+            String t_workTypeId, String t_recordTypeId, String t_addy1, String t_city, String t_county, String t_postcode, String t_country, String t_pin, String t_territoryId) {
+            workOrders.add(JSON.serialize(
+                    new WorkOrderHelper(
+                            t_startDate, t_endDate, t_resourceId, t_workTypeId,
+                            t_recordTypeId, t_addy1, t_city, t_county, t_postcode, t_country, t_pin, t_territoryId
+                    )
+            ));
+    }
+
+    public with sharing class WorkOrderHelper {
+
+        public Datetime startDate {set; get;}
+        public Datetime endDate {set; get;}
+        public String resourceId {set; get;}
+        public String workTypeId {set; get;}
+        public String recordTypeId {set; get;}
+        public String addy1 {set; get;}
+        public String city {set; get;}
+        public String county {set; get;}
+        public String postcode {set; get;}
+        public String country {set; get;}
+        public String pin {set; get;}
+        public String territoryId {set; get;}
+
+        public WorkOrderHelper(Datetime t_startDate, Datetime t_endDate, String t_resourceId,
+                String t_workTypeId, String t_recordTypeId, String t_addy1, String t_city, String t_county, String t_postcode, String t_country, String t_pin, String t_territoryId) {
+            startDate = t_startDate;
+            endDate = t_endDate;
+            resourceId = t_resourceId;
+            workTypeId = t_workTypeId;
+            recordTypeId = t_recordTypeId;
+            addy1 = t_addy1;
+            city = t_city;
+            county = t_county;
+            postcode = t_postcode;
+            country = t_country;
+            pin = t_pin;
+            territoryId = t_territoryId;
+        }
+    }
+
+    @future(callout=true)
+    public static void initCreateRecords(List<String> workOrders) {
+        WorkOrderHelper currentWorkOrder;
+        for (String wo : workOrders)
+        {
+
+            currentWorkOrder = (WorkOrderHelper) JSON.deserialize(wo, WorkOrderHelper.class);
+            System.debug('Deserialized in future:'+currentWorkOrder.city);
+            createRecords(currentWorkOrder.startDate,currentWorkOrder.endDate,currentWorkOrder.resourceId,
+                    currentWorkOrder.workTypeId,currentWorkOrder.recordTypeId,currentWorkOrder.addy1,currentWorkOrder.city,currentWorkOrder.county,currentWorkOrder.postcode,currentWorkOrder.country, currentWorkOrder.pin, currentWorkOrder.territoryId);
+        }
+    }
 
     // Create WO / SA / AR
-    @future(callout=true)
+    //@future(callout=true)
     public static void createRecords(datetime startDate, datetime endDate, string resourceId, 
       string workTypeId, string recordTypeId, string addy1, string city, string county, string postcode, string country, string pin, string territoryId) {
         // Create WO

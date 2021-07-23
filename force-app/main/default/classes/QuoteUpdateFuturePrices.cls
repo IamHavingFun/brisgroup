@@ -25,7 +25,7 @@ public void createLists(Id qId)
         List<QuoteLineItem> updatePrice = new List<QuoteLineItem>();
         masterList = [SELECT Id, PricebookEntry.Product2.Name , PriceBookEntry.Product2.Site__c, QuoteId, IFS_Price__c FROM QuoteLineItem WHERE QuoteId =: qId];         
         system.debug('****masterList: ' + masterList.size());
-        cusNo = [SELECT Id,Opportunity.Account.AccountNumber FROM Quote WHERE Id=:qid].Opportunity.Account.AccountNumber;
+        cusNo = [SELECT Opportunity.Account.AccountNumber FROM Quote WHERE Id=:qid].Opportunity.Account.AccountNumber;
         cusNo = cusNo.substring(0,4);
         System.debug('****CustNo : ' +cusNo);
         Map<string, double> priceMap = new Map<string, double>();
