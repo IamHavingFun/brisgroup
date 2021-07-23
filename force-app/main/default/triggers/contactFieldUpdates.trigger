@@ -11,6 +11,7 @@
 trigger contactFieldUpdates on Contact (before insert, before update) {
 
     if (Trigger.isBefore && (Trigger.isInsert || Trigger.isUpdate)) {
+        // Update contact fields before records are persisted to the Database
         ContactTriggerHandler.updateContactFields(Trigger.new);
     }
 

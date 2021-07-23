@@ -1,8 +1,18 @@
-global class BusinessHoursFunctions {
+/**
+ * @author PolSource
+ */
+public with sharing class BusinessHoursFunctions {
 
+    private BusinessHoursFunctions() {}
+
+    /**
+     * @param requests 
+     * @return  `List<DateTime>`
+     */
     @InvocableMethod(label='getDueDate' description='getDueDate for SLA via Business Hours')
-    global static List<DateTime> getDueDate(getDueDateParameters[] requests)
+    public static List<DateTime> getDueDate(getDueDateParameters[] requests)
     {
+        // list of Business Hours
         List<Datetime> dateTimes = new List<Datetime>();
         List<String> businessHourNames = new List<String>();
         // create a list with all business hour names
@@ -16,6 +26,7 @@ global class BusinessHoursFunctions {
             businessHourByName.put(bh.Name, bh);
         }
         for (getDueDateParameters request : requests) {
+            // Checks if current due Date paramter's Business Hour Name is included in Map
             if (businessHourByName.containsKey(request.businessHoursName)) {
                 BusinessHours bh = businessHourByName.get(request.businessHoursName);
                 Long duration = (long)(request.days * (request.hoursPerDay * 3600000)); //1 hour in milliseconds
@@ -27,17 +38,20 @@ global class BusinessHoursFunctions {
         return dateTimes;
     }
     
-    global class getDueDateParameters {
+    /**
+     * Class used as input parameter for Invocable method
+     */
+    public class getDueDateParameters {
         @InvocableVariable(required=true)
-        global String businessHoursName;
+        public String businessHoursName;
         
         @InvocableVariable(required=true)
-        global DateTime startDate;
+        public DateTime startDate;
         
         @InvocableVariable(required=true)
-        global Integer days;
+        public Integer days;
         
         @InvocableVariable(required=true)
-        global Double hoursPerDay;
+        public Double hoursPerDay;
     }  
 }

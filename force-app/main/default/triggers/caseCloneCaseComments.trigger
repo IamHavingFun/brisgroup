@@ -6,6 +6,7 @@
 trigger caseCloneCaseComments on Case (after insert) {
 
     if (Trigger.isAfter && Trigger.isInsert) {
+        // copy all case comments from a cloned case to the new case
         CaseTriggerHandler.copyAllCommentsFromCase(Trigger.new);
     }
 

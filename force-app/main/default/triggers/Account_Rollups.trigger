@@ -3,6 +3,7 @@
 
 trigger Account_Rollups on Account (before insert, before update) {
     if (Trigger.isBefore && Trigger.isUpdate) {
+        // Calculate Custom Rollup fields on Account records
         Account_RollupsHandler.calculateRollUps(Trigger.new);
     }
 }

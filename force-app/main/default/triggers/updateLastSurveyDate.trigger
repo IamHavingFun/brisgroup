@@ -6,6 +6,7 @@
 trigger updateLastSurveyDate on Case (before update) {
 
     if (Trigger.isBefore && Trigger.isUpdate) {
+        // Update information on related Contact and Account records
         CaseTriggerHandler.updateDatesOnContactAndAccounts(Trigger.new);
     }
 

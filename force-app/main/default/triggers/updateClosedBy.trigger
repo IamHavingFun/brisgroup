@@ -6,6 +6,7 @@
 trigger updateClosedBy on Case (before insert,before update) {
 
     if (Trigger.isBefore && (Trigger.isInsert || Trigger.isUpdate)) {
+        // Update Closed By value on all Cases before they are persisted to the database
         CaseTriggerHandler.updateClosedBy(Trigger.new);
     }
 
