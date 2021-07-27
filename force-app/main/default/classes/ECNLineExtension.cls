@@ -38,17 +38,17 @@ public with sharing class ECNLineExtension{
     public List<SelectOption> getOptions() {
         Map<String, Schema.SObjectField> M = Schema.SObjectType.Product__c.fields.getMap();
         List<SelectOption> options = new List<SelectOption>();
-        for(String key : M.KeySet()) {
-            if(line.Field_to_Change__c == M.get(key).getDescribe().getLabel()) {
+        for (String key : M.KeySet()) {
+            if (line.Field_to_Change__c == M.get(key).getDescribe().getLabel()) {
                 Schema.DescribeFieldResult fieldResult = M.get(key).getDescribe();
                 List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
                 options.add(new SelectOption('Please select','Please select'));
                 line.New_Value__c = '';
-                for(Schema.PicklistEntry f : ple) {
+                for (Schema.PicklistEntry f : ple) {
                     options.add(new SelectOption(f.getLabel(), f.getLabel()));
                 }
                 Schema.DisplayType fielddataType = M.get(key).getDescribe().getType();
-                if(fielddataType == Schema.DisplayType.Boolean) {
+                if (fielddataType == Schema.DisplayType.Boolean) {
                     options.add(new SelectOption('true','true'));
                     options.add(new SelectOption('false','false'));
                 }
