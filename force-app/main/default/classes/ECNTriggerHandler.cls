@@ -38,6 +38,7 @@ public with sharing class ECNTriggerHandler {
     public static void updateRelatedProducts(List<ECN__c> records) {
         // get all product and ECN IDs (binding variable used on WHERE clause)
         List<String> productIds = getAllProductIds(records);
+        System.debug('productIds: ' + productIds);
         List<String> newEcnIds = getNewECNIds(records);
         List<String> allecnIds = getAllECNIds(records);
         
@@ -66,15 +67,15 @@ public with sharing class ECNTriggerHandler {
             // Update PAS_Owner__c field value with Owner Id value from Product record
             ecn.PAS_Owner__c = PASOwner;  
 
-            if(ecn.Status__c == 'Completed') {
-                system.debug('*****Trigger UpdateProductFields ECN ID: ' + ecnId);
+            if (ecn.Status__c == 'Completed') {
                 String prodId = ecn.Product__c;
-                system.debug('*****Trigger UpdateProductFields Product ID: ' + prodId);         
 
                 Product__c prod = productsById.get(prodId);
-                    
+
+                if (!linesByECN.containsKey(ecnId)) {
+                    continue;
+                }
                 list<ECN_Line__c> el = linesByECN.get(ecnId);
-                system.debug('ECN Lines: ' + el.size());
                 
                 if (ecn.Type__c == 'Discontinuation') {
                     prod.Discontinuation_Effective_Date__c = ecn.Effective_Date__c;
@@ -123,7 +124,9 @@ public with sharing class ECNTriggerHandler {
     private static List<String> getAllProductIds(List<ECN__c> records) {
         List<String> productIds = new List<String>();
         for (ECN__c ecn : records) {
-            productIds.add(ecn.Product__c);
+            if (String.isNotBlank(ecn.Product__c)) {
+                productIds.add(ecn.Product__c);
+            }
         }
         return productIds;
     }
@@ -134,8 +137,9 @@ public with sharing class ECNTriggerHandler {
      */
     private static List<String> getNewECNIds(List<ECN__c> records) {
         List<String> newEcnIds = new List<String>();
+        List<String> allowedStatuses = new List<String> {'New', 'Rejected', 'Awaiting Finance Approval'};
         for (ECN__c ecn : records) {
-            if (ecn.Status__c == 'New' || ecn.Status__c == 'Rejected' || ecn.Status__c == 'Awaiting Finance Approval') {
+            if (allowedStatuses.contains(ecn.Status__c) && String.isNotBlank(ecn.Id)) {
                 newEcnIds.add(ecn.Id);
             }
         }
@@ -147,7 +151,13 @@ public with sharing class ECNTriggerHandler {
      * @return  `List<String>`
      */
     private static List<String> getAllECNIds(List<ECN__c> records) {
-        return new List<String>((new Map<String, ECN__c>(records)).keySet());
+        List<String> ecnIds = new List<String>();
+        for (ECN__c ecn : records) {
+            if (String.isNotBlank(ecn.Id)) {
+                ecnIds.add(ecn.Id);
+            }
+        }
+        return ecnIds;
     }
 
     private static void updateOldValueOnLines(List<String> newEcnIds) {

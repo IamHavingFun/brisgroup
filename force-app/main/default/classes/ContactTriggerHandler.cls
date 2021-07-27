@@ -23,12 +23,14 @@ public with sharing class ContactTriggerHandler {
             Map<String, Account> accountMap = new Map<String, Account>([SELECT Id, RecordType.Name, AccountNumber FROM Account WHERE Id IN :accountIds]);
             for (Contact con: records) {
                 // get account record
-                Account acc = accountMap.get(con.AccountId);
-                // Set record type field
-                con.Account_RecType__c = acc.RecordType.Name;
-                if (acc.RecordType.Name == 'Direct') {
-                    // Set account number field
-                    con.Account_Number__c = acc.AccountNumber; 
+                if (String.isNotBlank(con.AccountId)) {
+                    Account acc = accountMap.get(con.AccountId);
+                    // Set record type field
+                    con.Account_RecType__c = acc.RecordType.Name;
+                    if (acc.RecordType.Name == 'Direct') {
+                        // Set account number field
+                        con.Account_Number__c = acc.AccountNumber; 
+                    }
                 }
                 // if contact record has value on MobilePhone property
                 if (String.isNotBlank(con.MobilePhone)) {
@@ -53,7 +55,7 @@ public with sharing class ContactTriggerHandler {
                 }      
             }
         } catch (Exception e) {
-            System.debug('************************** Exception in trigger on Contacts:'+e);
+            System.debug('************************** Exception in trigger on Contacts:' + e.getStackTraceString());
         }        
     }
 }

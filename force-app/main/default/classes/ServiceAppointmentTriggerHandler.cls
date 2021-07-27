@@ -23,7 +23,7 @@ public with sharing class ServiceAppointmentTriggerHandler {
           }
           // returns a WorkOrder record given an Id
           Map<String, WorkOrder> workOrderById = new Map<String, WorkOrder>([SELECT 
-                                                Id, Division__c, Product__c, IFS_Order_Number__c, Case.Id, Case.CaseNumber, Case.Subject, Case.Reason, Case.Work_Order_Recall__c 
+                                                Id, Division__c, Product__c, IFS_Order_Number__c, CaseId, Case.CaseNumber, Case.Subject, Case.Reason, Case.Work_Order_Recall__c 
                                                 FROM WorkOrder WHERE Id IN :workOrders]);
           // returns a Contact record given an Id
           Map<String, Contact> contactsById = new Map<String, Contact>([SELECT Email, MobilePhone, Mobile_Phone_Email__c, FirstName FROM Contact WHERE Id IN :contactIds]);
@@ -32,7 +32,6 @@ public with sharing class ServiceAppointmentTriggerHandler {
             String division = '', caseNum = '', caseSub = '', caseReason = '', product = '', orderNo = '';
             Boolean recall = false;
             String woId = sa.ParentRecordId;
-            woId = woId.substring(0,15);
         
             // Check scheduled start time is not blank
             if (sa.SchedStartTime != null) {
@@ -42,7 +41,7 @@ public with sharing class ServiceAppointmentTriggerHandler {
             }  
             // Get division from work order
             WorkOrder wo = workOrderById.get(woId);
-            if (String.isNotBlank(wo.Case.Id)) {
+            if (String.isNotBlank(wo.CaseId)) {
               division = wo.Division__c;
               caseNum = wo.Case.CaseNumber;
               caseSub = wo.Case.Subject;        
@@ -73,7 +72,7 @@ public with sharing class ServiceAppointmentTriggerHandler {
             }
           }
         } catch (Exception e) {
-          System.debug('************************** Exception in ServiceAppt_Updates trigger:'+e);
+          System.debug('************************** Exception in ServiceAppt_Updates trigger:' + e.getStackTraceString());
         }
     }
 }
