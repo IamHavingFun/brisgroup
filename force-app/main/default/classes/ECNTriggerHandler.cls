@@ -60,7 +60,6 @@ public with sharing class ECNTriggerHandler {
         // Returns a Product__c record based on its ID
         Map<String, Product__c> productsById = new Map<String, Product__c>((List<Product__c>) Database.query(query));
         for (ECN__c ecn : records) {
-            String ecnId = ecn.Id;
             // get Product Record
             Product__c proddata = productsById.get(ecn.Product__c);
             ID PASOwner = proddata.OwnerID;
@@ -68,14 +67,12 @@ public with sharing class ECNTriggerHandler {
             ecn.PAS_Owner__c = PASOwner;  
 
             if (ecn.Status__c == 'Completed') {
-                String prodId = ecn.Product__c;
+                Product__c prod = productsById.get(ecn.Product__c);
 
-                Product__c prod = productsById.get(prodId);
-
-                if (!linesByECN.containsKey(ecnId)) {
+                if (!linesByECN.containsKey(ecn.Id)) {
                     continue;
                 }
-                list<ECN_Line__c> el = linesByECN.get(ecnId);
+                list<ECN_Line__c> el = linesByECN.get(ecn.Id);
                 
                 if (ecn.Type__c == 'Discontinuation') {
                     prod.Discontinuation_Effective_Date__c = ecn.Effective_Date__c;
@@ -101,6 +98,9 @@ public with sharing class ECNTriggerHandler {
                         } else {
                             // String value is used
                             newValue = ecnl.New_Value__c;
+                        }
+                        if (ecnl.Field_to_Change__c == 'Supersede Code') {
+                            prod.Supersede_Date__c = ecn.Effective_Date__c;
                         }
                         prod.put(productMap.Product_Field_API_Name__c, newValue);
                     }
