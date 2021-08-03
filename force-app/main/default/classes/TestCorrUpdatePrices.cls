@@ -43,8 +43,8 @@ private class TestCorrUpdatePrices {
         List<Price_Enquiry_Line__c> oli = [SELECT Id,Customer_Price__c,Product__r.Name,Product__r.Site__c,Correspondence__c FROM Price_Enquiry_Line__c WHERE Correspondence__c =: ordr.Id];
         
         //Looping through each line item to check prices has been updated
-        //for(Price_Enquiry_Line__c o: oli){
-        //  system.assertEquals(o.Customer_Price__c, decimal.valueOf(sites.get(o.Product__r.Site__c).get(o.Product__r.Name)));
-        //}
+        for(Price_Enquiry_Line__c o: oli){
+          system.assertEquals(o.Customer_Price__c, decimal.valueOf(sites.get(o.Product__r.Site__c).get(o.Product__r.Name)));
+        }
     }
 }

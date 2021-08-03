@@ -25,6 +25,8 @@ private class TestOpportunityProductPriceUpdate {
         //Creating a map that stores Site and its corresponding product information
         Map<String,Map<String,string>> sites =new Map<String,Map<String,string>>();
         sites.put('01',prices1);
+        sites.put('02',prices2);
+        sites.put('03',prices3);
         sites.put('04',prices4);
          system.debug('*****sitesss' + sites);
          
@@ -41,8 +43,8 @@ private class TestOpportunityProductPriceUpdate {
         List<OpportunityLineItem> oli = [SELECT Id,IFS_Price__c,PriceBookEntry.Product2.Name,PriceBookEntry.Product2.Site__c,OpportunityId FROM OpportunityLineItem WHERE OpportunityId =: oppty.Id];
         
         //Looping through each line item to check prices has been updated
-        //for(OpportunityLineItem o: oli){
-        //  system.assertEquals(o.IFS_Price__c, decimal.valueOf(sites.get(o.PriceBookEntry.Product2.Site__c).get(o.PriceBookEntry.Product2.Name)));
-        //}
+        for(OpportunityLineItem o: oli){
+            system.assertEquals(o.IFS_Price__c, decimal.valueOf(sites.get(o.PriceBookEntry.Product2.Site__c).get(o.PriceBookEntry.Product2.Name)));
+        }
     }
 }

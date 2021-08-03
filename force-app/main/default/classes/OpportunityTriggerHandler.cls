@@ -88,4 +88,110 @@ public with sharing class OpportunityTriggerHandler {
         }
         return opportunitiesByProject;
     }
+
+
+    /**
+     * @param records 
+     */
+    public static void tgrPopulateAssignedToField_Opportunity(List<Opportunity> records){
+
+        Map<Id, String> ownerMap = new Map<Id, String>();
+        Map<Id, String> managerMap = new Map<Id, String>();
+    
+//  Get owner name from user using OwnerID  
+
+        for (Opportunity o : records)
+        {
+            ownerMap.put(o.OwnerId, null);
+        }
+
+        if (ownerMap.size() > 0)
+        {
+            for (User[] users : [SELECT Id, Name FROM User WHERE Id IN :ownerMap.keySet()])
+        {
+            for (Integer i=0; i<users.size(); i++)
+            {
+                ownerMap.put(users[i].Id, users[i].Name);
+            }
+        }
+            for (Opportunity o : records)
+            {
+                o.Assigned_To__c  = ownerMap.get(o.OwnerId);
+            }
+        }  
+
+//  Get ManagerName__c from user using OwnerID
+
+        for (Opportunity o : records)
+        {
+            managerMap.put(o.OwnerId, null);
+        }
+
+        if (managerMap.size() > 0)
+        {
+            for (User[] users : [SELECT Id, ManagerName__c FROM User WHERE Id IN :managerMap.keySet()])
+            {
+                for (Integer i=0; i<users.size(); i++)
+                {
+                    managerMap.put(users[i].Id, users[i].ManagerName__c);
+                }
+            }
+            for (Opportunity o : records)
+            {
+                o.ManagerName__c  = managerMap.get(o.OwnerId);
+            }
+        }  
+
+
+    }
+
+
+    /**
+     * @param records 
+     */
+    public static void updateDivisionfieldonOpp(List<Opportunity> records){
+
+        Try
+        {     
+            //Declaration 
+            Map<id,user> UsrMap=new Map<id,user>([
+                SELECT id,Name,Division__c,Approver_1__c,Approver_2__c,Approver_3__c
+                FROM user
+            ]); //Creating map of user ids and user record
+        
+               
+            for(Opportunity Opp : records) {  
+             //If Lead owner's division is not specified than lead record's division will also blank.  
+                if( Opp.Division__c==Null){
+                    if(UsrMap.get(Opp.ownerid).Division__c==Null) { 
+                        Opp.Division__c='';
+                    }//End of if statement    
+                
+                    else { //If Lead owner's division is specified than lead record's division will be updated by lead owner's 'Division'.  
+                        Opp.Division__c=UsrMap.get(Opp.ownerid).Division__c;
+                    }//End of else statement
+                }
+             
+                //Updating the Approvers field on opportunity wrt Users field
+                if(UsrMap.get(Opp.ownerid).Approver_1__c!=Null){
+                    Opp.Approver_1__c=UsrMap.get(Opp.ownerid).Approver_1__c;
+                }
+              
+                //Updating the Approvers field on opportunity wrt Users field
+                if(UsrMap.get(Opp.ownerid).Approver_2__c!=Null){
+                    Opp.Approver_2__c=UsrMap.get(Opp.ownerid).Approver_2__c;
+                }
+                
+                //Updating the Approvers field on opportunity wrt Users field
+                if(UsrMap.get(Opp.ownerid).Approver_3__c!=Null){
+                    Opp.Approver_3__c=UsrMap.get(Opp.ownerid).Approver_3__c;
+                }
+            }  //End of for loop            
+        
+        }Catch(Exception e){
+         system.debug('************************************Exception in Trigger on opp:'+e);
+        }
+        
+    }  
+
 }

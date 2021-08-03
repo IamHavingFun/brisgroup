@@ -26,6 +26,8 @@ private class TestOrderUpdatePrices {
         //Creating a map that stores Site and its corresponding product information
         Map<String,Map<String,string>> sites =new Map<String,Map<String,string>>();
         sites.put('01',prices1);
+        sites.put('02',prices2);
+        sites.put('03',prices3);
         sites.put('04',prices4);
          system.debug('*****sitesss' + sites);
          
@@ -51,8 +53,8 @@ private class TestOrderUpdatePrices {
         Boolean o1 = OrderUpdatePrices.createList(ordr.Id);
         Boolean o2 = OrderUpdatePrices.createList(ordr2.Id);
         //Looping through each line item to check prices has been updated
-        //for(Order_Line__c o: oli){
-        //  system.assertEquals(o.Customer_Price__c, decimal.valueOf(sites.get(o.Product__r.Site__c).get(o.Product__r.Name))*1.2);
-        //}
+        for(Order_Line__c o: oli){
+          system.assertEquals(o.Customer_Price__c, decimal.valueOf(sites.get(o.Product__r.Site__c).get(o.Product__r.Name)));
+        }
     }
 }

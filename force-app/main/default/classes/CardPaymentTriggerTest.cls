@@ -1,60 +1,84 @@
 @isTest(SeeAllData = True)
 private class CardPaymentTriggerTest {
 
-    static testMethod void myUnitTest() {
-        // TO DO: implement unit test
+    static testMethod void shouldSetPaymentIsFromConsoleView() {
         
-        Profile serviceuser = [Select Name, Id From Profile where Name = 'System Administrator' limit 1 ]; //Service Back Office User
-        
-        
-        //serviceuser.Name = 'Service Back Office UsertEST';
-        //serviceuser.
-        
-        
-        system.debug('#### serviceuser =' + serviceuser);
-    
+        Profile serviceuser = [Select Name, Id From Profile where Name = 'System Administrator' limit 1 ]; //Service Back Office User 
         User thisuser = [select id, name from User where IsActive = TRUE AND  Profileid = : serviceuser.id limit 1];
-        
-        // User u2 = new User(Alias = 'newTTTT', Email='newuser@testorg.com', 
-        // EmailEncodingKey='UTF-8', LastName='Testingqq', LanguageLocaleKey='en_US', 
-        // LocaleSidKey='en_US', ProfileId = serviceuser.Id, 
-       //  TimeZoneSidKey='America/Los_Angeles', UserName='newuserTTTT@testorg.com');
-        
-        
-              
-        
-         System.runAs(thisuser)
+           
+        System.runAs(thisuser)
         {
+            TestUtilityClass.setUpData();
             
-            Account newacc = new Account(Name = 'test name' );
-            insert newacc;
-            
-            Contact ct = new Contact(LastName = 'Paul', FirstName = 'have', AccountID = newacc.id, MailingStreet = 'Test Street', MailingCity = 'Test City',
-             MailingState = 'Test State', MailingPostalCode = 'AAA AAA', MailingCountry = 'United Kingdom', Birthdate = date.newInstance(1988, 04, 06), Email = 'Test.User@User.com');
-                
-            insert ct;   
-            
-            //Order__c ord = new Order__c(Delivery_Term__c  );
+            Account newacc = TestUtilityClass.acc;
+            Contact ct = TestUtilityClass.con;      
             Order__c ord = [Select id From Order__c limit 1];
-            
-            
+ 
             system.debug('#### ord =' + ord);
-            
-            
-            Income_Card_Payment__c inc = new Income_Card_Payment__c(Immediate_Amount__c = 100, Contact__c = ct.id, 
-             Payment_Status__c = 'Authorised', Card_Type__c  = '', Authorisation_Date__c  = Date.today(), Transaction_Type__c  = 'Sale'
-             , Order__c = ord.id );
-             
+       
+            Income_Card_Payment__c inc = new Income_Card_Payment__c(
+                Immediate_Amount__c = 100,
+                Contact__c = ct.Id,
+                Payment_Status__c = 'Authorised',
+                Card_Type__c  = '',
+                Authorisation_Date__c  = Date.today(),
+                Transaction_Type__c  = 'Sale',
+                Order__c = ord.Id
+            );
+
+            Test.startTest();
             insert inc;
-            
+            Test.stopTest();
+
+            Income_Card_Payment__c incAfterUpdate = [
+                SELECT Id, Payment_Is_From_Console_View__c
+                FROM  Income_Card_Payment__c
+                WHERE Id = :inc.Id
+            ];
+
+            System.assertEquals(true, incAfterUpdate.Payment_Is_From_Console_View__c);
         }
-        
-        
-        
+      
     }
-    
-    
-    
-    
-    
+
+
+    static testMethod void shouldSetPaymentIsFromConsoleViewAsFalse() {
+
+        Profile standardUser = [Select Name, Id From Profile where Name = 'System Admin No Password Expiry' limit 1 ]; //User not covered by trigger
+        User standardPlatformUser = [select id, name from User where IsActive = TRUE AND  Profileid = : standardUser.id limit 1];
+
+        
+        TestUtilityClass.setUpData();
+        Account newacc = TestUtilityClass.acc;
+        Contact ct = TestUtilityClass.con;
+        Order__c ord = [Select id From Order__c limit 1];      
+        
+        Income_Card_Payment__c inc = new Income_Card_Payment__c(
+            Immediate_Amount__c = 100,
+            Contact__c = ct.Id,
+            Payment_Status__c = 'Authorised',
+            Card_Type__c  = '',
+            Authorisation_Date__c  = Date.today(),
+            Transaction_Type__c  = 'Sale',
+            Order__c = ord.Id
+        );
+
+        System.runAs(standardPlatformUser)
+        {
+            Test.startTest();
+            insert inc;
+            Test.stopTest();
+
+            Income_Card_Payment__c incAfterUpdate = [
+                SELECT Id, Payment_Is_From_Console_View__c
+                FROM  Income_Card_Payment__c
+                WHERE Id = :inc.Id
+            ];
+
+            System.assertEquals(false, incAfterUpdate.Payment_Is_From_Console_View__c);
+
+        }
+
+    }
+     
 }

@@ -15,12 +15,18 @@ private class TestOpportunityProductPriceUpdateLE {
         //Creating Different Price maps       
         Map<String,string> prices1 = new Map<String,string>();
         prices1.put('HY PUMP70','164.08');
+        Map<String,string> prices2 = new Map<String,string>();
+        prices2.put('HY PUMP50','100.08');
+        Map<String,string> prices3 = new Map<String,string>();
+        prices3.put('HY PUMP100','95.00');
         Map<String,string> prices4 = new Map<String,string>();
         prices4.put('HY PUMP71','145.50');
         
         //Creating a map that stores Site and its corresponding product information
         Map<String,Map<String,string>> sites =new Map<String,Map<String,string>>();
         sites.put('01',prices1);
+        sites.put('02',prices2);
+        sites.put('03',prices3);
         sites.put('04',prices4);
          system.debug('*****sitesss' + sites);
          
@@ -40,8 +46,8 @@ private class TestOpportunityProductPriceUpdateLE {
         Boolean q1 = OpportunityUpdatePricesLE.createList(oppty.Id);
         
         //Looping through each line item to check prices has been updated
-//        for(OpportunityLineItem o: oli){
-//          system.assertEquals(o.IFS_Price__c, decimal.valueOf(sites.get(o.PriceBookEntry.Product2.Site__c).get(o.PriceBookEntry.Product2.Name)));
-//        }
+        for(OpportunityLineItem o: oli){
+          system.assertEquals(o.IFS_Price__c, decimal.valueOf(sites.get(o.PriceBookEntry.Product2.Site__c).get(o.PriceBookEntry.Product2.Name)));
+        }
     }
 }

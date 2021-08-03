@@ -71,12 +71,15 @@ public class LCC_JSMQueryResultService {
 
     @AuraEnabled
     public static sObject loadObjectInfoById(Id recordId) {
-
-        DescribeSObjectResult objectType = recordId.getSobjectType().getDescribe();
-        List<String> objectFields = new List<String>(objectType.fields.getMap().keySet());
-
-        String query = 'SELECT ' + String.join(objectFields, ',') + ' FROM ' + objectType.getName() + ' WHERE Id = \'' + String.escapeSingleQuotes(recordId) + '\' LIMIT 1';
-
-        return executeQueryOneObject(query);
+        try {
+            DescribeSObjectResult objectType = recordId.getSobjectType().getDescribe();
+            List<String> objectFields = new List<String>(objectType.fields.getMap().keySet());
+    
+            String query = 'SELECT ' + String.join(objectFields, ',') + ' FROM ' + objectType.getName() + ' WHERE Id = \'' + String.escapeSingleQuotes(recordId) + '\' LIMIT 1';
+    
+            return executeQueryOneObject(query);            
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage()); 
+        }
     }
 }

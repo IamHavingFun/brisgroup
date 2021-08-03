@@ -52,9 +52,8 @@ public class SabioSfdcSoftphoneUmCuCallsTest {
     }
         
     private static Account insertTestAccount() {
-        //Account obj = new Account(recordTypeId = queryForPersonRecType());
-        //Account obj = new Account(recordTypeId = '012c0000000Cq3k');
-        Account obj = new Account(recordTypeId = '012D00000007IS4IAM');        
+        Id recordTypeId = DataFactory.getAccountRecordTypeId('Person Account');
+        Account obj = new Account(recordTypeId = recordTypeId);
         obj.firstName = name;
         obj.lastname = name;
         insert obj;

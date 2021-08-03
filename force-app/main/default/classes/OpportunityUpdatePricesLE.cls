@@ -56,7 +56,8 @@ global class OpportunityUpdatePricesLE {
         cusNo = [Select id, name, Account.AccountNumber from Opportunity where id=:oppid].Account.AccountNumber;
         marNo = [Select id, name, MarketingAccNum__c from Opportunity where id=:oppid].MarketingAccNum__c;
         custType = [Select id, name, AccountType__c from Opportunity where id=:oppid].AccountType__c;
-        if(custType != '012D0000000708V')
+
+        if(custType != String.valueOf(DataFactory.getAccountRecordTypeId('Direct')).substring(0, 15))
         {
             cusNo = marNo;
         }
