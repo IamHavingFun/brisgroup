@@ -1,10 +1,9 @@
 /**
  * 
  * @author PolSource
- * @description provides code and use cases coverage for ECNTrigger
  */
 @IsTest
-public class ECNGetOldValueTest {
+public with sharing class ECNTriggerTest {
 
     @TestSetup 
     static void initData() {
@@ -85,4 +84,5 @@ public class ECNGetOldValueTest {
         System.assertEquals('New', prod.Long_Part_Description__c, 'Long Part description must match');
         System.assertEquals('New', prod.Short_Part_Description__c, 'Long Part description must match');
     }
+    
 }

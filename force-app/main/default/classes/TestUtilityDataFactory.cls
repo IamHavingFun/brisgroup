@@ -19,6 +19,7 @@ public with sharing class TestUtilityDataFactory {
             Alias = alias, 
             Email = alias + '@testorg.com', 
             EmailEncodingKey = 'UTF-8',
+            FirstName = alias.toUpperCase(),
             LastName = alias.toUpperCase(),
             LanguageLocaleKey = 'en_US', 
             LocaleSidKey = 'en_US',
@@ -124,5 +125,189 @@ public with sharing class TestUtilityDataFactory {
             Subject = 'Test Case',
             RecordTypeId = recordTypeId
         );
+    }
+
+    /**
+     * 
+     * @param caseRecordType Record Type Developer Name
+     * @param commentNumber Total number of comment records to create
+     * @return  `Case`
+     */
+    public static Case insertCaseWithComments(String caseRecordType, Integer commentNumber) {
+        Id recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get(caseRecordType).getRecordTypeId();
+        Case caseTest = new Case(
+            Subject = 'Test Case',
+            RecordTypeId = recordTypeId
+        );
+        insert caseTest;
+        // List of comments
+        List<CaseComment> comments = new List<CaseComment>();
+        for (Integer i = 0; i < commentNumber; i++) {
+            CaseComment comment = new CaseComment(
+                ParentId = caseTest.Id,
+                CommentBody = 'Test Comment #' + i
+            );
+            comments.add(comment);
+        }
+        if (!comments.isEmpty()) {
+            insert comments;
+        }
+        return caseTest;
+    }
+
+    /**
+     * @return  `Contact`
+     */
+    public static Contact createPersonContact() {
+        Id recordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'PersonAccount' AND SObjectType = 'Account'].Id;
+        Account personAccount = new Account(
+            RecordTypeId = recordTypeId,
+            FirstName = 'Test',
+            LastName = 'Test',
+            PersonMailingStreet = 'Test Street',
+            PersonMailingPostalCode = '12345',
+            PersonMailingCity = 'SFO',
+            PersonEmail = 'test@bristangroup.com',
+            PersonHomePhone = '1234567',
+            PersonMobilePhone = '12345678');
+        insert personAccount;
+        return [SELECT Id, AccountId FROM Contact WHERE LastName = 'Test'];
+    }
+
+    /**
+     * 
+     * @return  `Contact`
+     */
+    public static Contact createContact() {
+        return new Contact(LastName = 'Test');
+    }
+
+    /**
+     * @return  `Account`
+     */
+    public static Account createPersonAccount() {
+        Id recordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'PersonAccount' AND SObjectType = 'Account'].Id;
+        return new Account(
+            RecordTypeId = recordTypeId,
+            FirstName = 'Test',
+            LastName = 'Test',
+            PersonMailingStreet = 'Test Street',
+            PersonMailingPostalCode = '12345',
+            PersonMailingCity = 'SFO',
+            PersonEmail = 'test@bristangroup.com',
+            PersonHomePhone = '1234567',
+            PersonMobilePhone = '12345678');        
+    }
+
+    /**
+     * @param recordTypeName 
+     * @return  `Account`
+     */
+    public static Account createBusinessAccount(String recordTypeName) {
+        Id accountRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get(recordTypeName).getRecordTypeId();
+        return new Account(
+            RecordTypeId = accountRecordTypeId,
+            Name = 'Test BA'
+        );
+    }
+
+    /**
+     * 
+     * @param orderRecordType 
+     * @param status 
+     * @param accountId 
+     * @param totalOrders 
+     */
+    public static void insertOrderRecordsForAccount(String orderRecordType, String status, String accountId, Integer totalOrders) {
+        Id orderRecordTypeId = Schema.SObjectType.Order__c.getRecordTypeInfosByDeveloperName().get(orderRecordType).getRecordTypeId();
+        Delivery_Term__c deliveryTerm = TestDataCreation.CreateDeliveryTermPST();
+        List<Order__c> orders = new List<Order__c>();
+        for (Integer i = 0; i < totalOrders; i++) {
+            Order__c order = new Order__c(
+                RecordTypeId = orderRecordTypeId,
+                Case_Account__c = accountId,
+                Status__c = status,
+                Delivery_Term__c = deliveryTerm.id);
+            orders.add(order);
+        }
+        if (!orders.isEmpty()) {
+            insert orders;
+        }
+    }
+
+    /**
+     * 
+     * @param totalRecords 
+     * @param contactId 
+     */
+    public static void insertWarrantyRecordsForAccount(Integer totalRecords, String contactId) {
+        List<Warranty__c> warranties = new List<Warranty__c>();
+        for (Integer i = 0; i < totalRecords; i++) {
+            warranties.add(new Warranty__c(Name = 'Test #' + i, Contact__c = contactId));
+        }
+        if (!warranties.isEmpty()) {
+            insert warranties;
+        }
+    }
+
+    /**
+     * 
+     * @param totalRecords 
+     * @param accountId 
+     * @param contactId 
+     */
+    public static void insertCasesForAccount(Integer totalRecords, String accountId, String contactId) {
+        List<Case> cases = new List<Case>();
+        for (Integer i = 0; i < totalRecords; i++) {
+            cases.add(new Case(
+                Subject = 'Test #' + i,
+                Description = 'Test #' + i,
+                Status = 'New', 
+                AccountId = accountId, 
+                ContactId = contactId)
+            );
+        }
+        if (!cases.isEmpty()) {
+            insert cases;
+        }
+    }
+
+    /**
+     * 
+     * @param totalRecords 
+     * @param contactId 
+     */
+    public static void insertCallsForAccount(Integer totalRecords, String contactId) {
+        List<Calls__c> calls = new List<Calls__c>();
+        for (Integer i = 0; i < totalRecords; i++) {
+            calls.add(new Calls__c(
+                Name = 'Test #' + i, 
+                Contact__c = contactId)
+            );
+        }
+        if (!calls.isEmpty()) {
+            insert calls;
+        }
+    }
+
+    /**
+     * 
+     * @param totalRecords 
+     * @param contactId 
+     */
+    public static void insertChatsForContact(Integer totalRecords, String contactId) {
+        List<LiveChatTranscript> chats = new List<LiveChatTranscript>();
+        LiveChatVisitor chatVisitor = new LiveChatVisitor();
+        insert chatVisitor;
+        for (Integer i = 0; i < totalRecords; i++) {
+            chats.add(new LiveChatTranscript(
+                LiveChatVisitorId = chatVisitor.Id,
+                StartTime = System.now(),
+                ContactId = contactId
+            ));
+        }
+        if (!chats.isEmpty()) {
+            insert chats;
+        }
     }
 }

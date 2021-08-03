@@ -41,6 +41,10 @@ public with sharing class CaseTriggerHandler {
                 // Returns the ID of the entity from which an object was cloned (Original Case record)
                 String csId = cs.getCloneSourceId();
                 List<CaseComment> comments = commentsByCase.get(csId);
+                // no comments found on case, skip record and continue with next one
+                if (comments == null) {
+                    continue;
+                }
                 // loop through all comment records from original case record
                 for (CaseComment comment : comments) {
                     CaseComment cc = new CaseComment();

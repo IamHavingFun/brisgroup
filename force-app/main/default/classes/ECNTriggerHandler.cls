@@ -56,7 +56,7 @@ public with sharing class ECNTriggerHandler {
         // products to be updated
         List<Product__c> products = new List<Product__c>();
         // build query for Product__c object
-        String query = getProductQuery();
+        String query = String.escapeSingleQuotes(getProductQuery());
         // Returns a Product__c record based on its ID
         Map<String, Product__c> productsById = new Map<String, Product__c>((List<Product__c>) Database.query(query));
         for (ECN__c ecn : records) {
