@@ -310,4 +310,25 @@ public with sharing class TestUtilityDataFactory {
             insert chats;
         }
     }
+
+    /**
+     * 
+     * @param recordType 
+     * @return  `Opportunity`
+     */
+    public static Opportunity createOpportunity(String recordType, String name, String pricebookId) {
+        Id recordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(recordType).getRecordTypeId();
+        return new Opportunity(
+                Name = name,
+                RecordTypeId = recordTypeId,
+                CloseDate = System.today(),
+                StageName = 'New Project',
+                Pricebook2Id = pricebookId,
+                Customer_Order_Number__c = 'Test Order',
+                Division__c = 'Group',
+                LeadSource = 'Glenigan',
+                Estimated_Start_Date__c = Date.today(),
+                Estimated_Completion__c = Date.today().addDays(60),
+                Initiated_By__c = 'Bristan');
+    }
 }

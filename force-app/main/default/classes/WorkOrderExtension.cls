@@ -1,4 +1,6 @@
 public class WorkOrderExtension {
+
+    @TestVisible
     private ApexPages.StandardController sc;
     public WorkOrderExtension(ApexPages.StandardController sc) {  
         this.sc = sc;

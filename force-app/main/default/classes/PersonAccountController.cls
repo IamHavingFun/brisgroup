@@ -87,6 +87,7 @@ public with sharing class PersonAccountController {
                     }
                 }
                 catch(System.DMLException e) {
+                    System.debug('TEST:e: ' + e.getStackTraceString());
                     ApexPages.addMessages(e);
                      return null;
                 }  
@@ -96,6 +97,7 @@ public with sharing class PersonAccountController {
             }
         }
         catch(System.DMLException e) {
+            System.debug('TEST:e: ' + e.getStackTraceString());
                 ApexPages.addMessages(e);
                 return null;
         }  

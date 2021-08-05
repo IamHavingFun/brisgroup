@@ -1,65 +1,72 @@
-@istest
+/**
+ * @author 
+ * @since 
+ */
+@IsTest
 public class PartsCatalogueTest {
 
-public static Account newacc;
-public static Contact ct;
-public static Case cs;
-public static EmailTemplate newEm;
-public static Product2 newprod;
-public static Product_Revision__c newpRev;
-public static Catalogue_Junction__c newCat;
-public static Spares_Revision__c newsp;
-public static Delivery_Term__c newdt;
+    public static Account newacc;
+    public static Contact ct;
+    public static Case cs;
+    public static EmailTemplate newEm;
+    public static Product2 newprod;
+    public static Product_Revision__c newpRev;
+    public static Catalogue_Junction__c newCat;
+    public static Spares_Revision__c newsp;
+    public static Delivery_Term__c newdt;
 
-static{  
-    newacc = TestDataCreation.CreateAccount('Test');
-    
-    ct = TestDataCreation.createContact('Paul', 'Harvie', newacc.id);
-    
-    cs = TestDataCreation.CreateCase('Test Case', newacc.id, ct.id);
-    
-    newdt = TestDataCreation.CreateDeliveryTermPST();
-    
-    
-    //EmailTemplate newEm = TestDataCreation.CreateEmailTemplate('Test Templ','++++++++ Paul Harvie and Steve Fouracre are brilliant Salesforce guys');
-    for (EmailTemplate eachtmpl :[Select Name, Id, HtmlValue From EmailTemplate]){
-        if (eachtmpl.HtmlValue != null){ 
-                newEm = eachtmpl;
-                break;
+    static {
+        newacc = TestDataCreation.CreateAccount('Test');
+        
+        ct = TestDataCreation.createContact('Paul', 'Harvie', newacc.id);
+        
+        cs = TestDataCreation.CreateCase('Test Case', newacc.id, ct.id);
+        
+        newdt = TestDataCreation.CreateDeliveryTermPST();
+        
+        
+        //EmailTemplate newEm = TestDataCreation.CreateEmailTemplate('Test Templ','++++++++ Paul Harvie and Steve Fouracre are brilliant Salesforce guys');
+        for (EmailTemplate eachtmpl :[Select Name, Id, HtmlValue From EmailTemplate]){
+            if (eachtmpl.HtmlValue != null){ 
+                    newEm = eachtmpl;
+                    break;
+            }
         }
+
+        system.debug('####### newEm =' + newEm);
+        TestDataCreation.CreateAppConfig('SendLinksEmailId', newEm.id);
+
+        newprod = TestDataCreation.CreateProduct('A Product');
+        newpRev = TestDataCreation.CreateProductRevision('Updated Prod', '1234', 'R1', newprod.id);
+        newsp = TestDataCreation.CreateSparesRevision('Spare Prod', '98765', 'R1', newprod.id); 
+        newCat = TestDataCreation.CreateCatalogueJunction(newpRev.id, newsp.id);
     }
-    
-    system.debug('####### newEm =' + newEm);
-    TestDataCreation.CreateAppConfig('SendLinksEmailId', newEm.id);
 
-    newprod = TestDataCreation.CreateProduct('A Product');
-    newpRev = TestDataCreation.CreateProductRevision('Updated Prod', '1234', 'R1', newprod.id);
-    newsp = TestDataCreation.CreateSparesRevision('Spare Prod', '98765', 'R1', newprod.id); 
-    newCat = TestDataCreation.CreateCatalogueJunction(newpRev.id, newsp.id);
-}
-
-    static testMethod void PartsCatalogueTest1(){
+    @IsTest
+    static void PartsCatalogueTest1() {
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
             Test.setcurrentPage(pr);
             PartsCatalogue pc = new PartsCatalogue();
-            system.assertEquals(pc.displayAddToCollection, true);
+            system.assert(pc.displayAddToCollection, 'Display Add to Collection must be TRUE');
             
             pc.assignFnd();
-            system.assert(pc.fnd == true);
+            system.assert(pc.fnd, 'Part Catalog find error');
         Test.stopTest();
     }
 
-    static testMethod void PartsCatalogueTest2(){
+    @IsTest
+    static void PartsCatalogueTest2() {
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=');
             Test.setcurrentPage(pr);
             PartsCatalogue pc = new PartsCatalogue();
-            system.assertEquals(pc.displayAddToCollection, false);
+            system.assert(!pc.displayAddToCollection, 'Display Add to Collection must be FALSE');
         Test.stopTest();
     }
     
-    static testMethod void addToCollectionTest(){
+    @IsTest
+    static void addToCollectionTest() {
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
             Test.setcurrentPage(pr);
@@ -72,13 +79,14 @@ static{
             pc.addProductID = newprod.id;
             pc.spareRevisionSelected = true;
             pc.addToCollection();
-            system.assertEquals(pc.allProductsCollections[0].selectedName, false);
-            system.assertEquals(pc.allProductsCollections[0].thisProdRevNumber, 'R1');
-            system.assertEquals(pc.allProductsCollections[0].thismasterSpareRev, 'Spare Prod');
+            system.assertEquals(pc.allProductsCollections[0].selectedName, false, 'Selected Name property must be FALSE');
+            system.assertEquals(pc.allProductsCollections[0].thisProdRevNumber, 'R1', 'ProdRevNumber does not match');
+            system.assertEquals(pc.allProductsCollections[0].thismasterSpareRev, 'Spare Prod', 'SpareRev does not match');
         Test.stopTest();
     }
 
-    static testMethod void sendEmailTest1(){
+    @IsTest
+    static void sendEmailTest1() {
         system.debug('####### sendEmailTest ');
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
@@ -95,12 +103,13 @@ static{
 
             pc.allProductsCollections[0].selectedName = true;           
             pc.sendEmail();
-            /*String msg = Test.getcurrentpage().getMessages().getMessage(0);
-            system.assertEquals(msg, 'Email was sent successfully.');*/
+            String msg = ApexPages.getMessages().get(0).getDetail();
+            System.assertEquals(msg, 'No products/documents selected, no email sent.', 'Email must not be sent');
         Test.stopTest();
     }
 
-    static testMethod void sendEmailTest2(){
+    @IsTest
+    static void sendEmailTest2(){
         system.debug('####### sendEmailTest2 ');        
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
@@ -139,7 +148,8 @@ static{
         Test.stopTest();
     }
 
-    static testMethod void addToCaseTest(){
+    @IsTest
+    static void addToCaseTest(){
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
             Test.setcurrentPage(pr);
@@ -159,35 +169,37 @@ static{
         Test.stopTest();
     }
 
- static testMethod void addToAssetTest(){
-    system.debug('####### addToAssetTest ' );
-    Test.startTest();
-      PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
-      Test.setcurrentPage(pr);
-      PartsCatalogue pc = new PartsCatalogue();
-      pc.addMasterProductID = newprod.id;
-      pc.addMasterProductRevNumber = 'R1';
-      pc.addMasterProdCode = '';
-      pc.addMasterSpareRev = 'Spare Prod';
-      pc.addMasterProdRevId = newpRev.id;
-      pc.addProductID = newprod.id;
-      pc.addspareRevisionSelected = true;
-      pc.addToCollection();
+    @IsTest
+    static void addToAssetTest(){
+        system.debug('####### addToAssetTest ' );
+        Test.startTest();
+            PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
+            Test.setcurrentPage(pr);
+            PartsCatalogue pc = new PartsCatalogue();
+            pc.addMasterProductID = newprod.id;
+            pc.addMasterProductRevNumber = 'R1';
+            pc.addMasterProdCode = '';
+            pc.addMasterSpareRev = 'Spare Prod';
+            pc.addMasterProdRevId = newpRev.id;
+            pc.addProductID = newprod.id;
+            pc.addspareRevisionSelected = true;
+            pc.addToCollection();
 
 
-      pc.allProductsCollections[0].selectedName = true;
-      pc.addToAsset();
-      //-ve
-      system.assertEquals([Select id From Product_Asset__c where Contact__c = :ct.id].size() , 0);
+            pc.allProductsCollections[0].selectedName = true;
+            pc.addToAsset();
+            //-ve
+            system.assertEquals([Select id From Product_Asset__c where Contact__c = :ct.id].size() , 0);
 
-      //+ve
-      pc.allProductsCollections[0].thisspareRevisionSelected = false;
-      pc.addToAsset();      
-      system.assertEquals([Select id From Product_Asset__c where Contact__c = :ct.id].size() , 1);
-    Test.stopTest();
-  }
+            //+ve
+            pc.allProductsCollections[0].thisspareRevisionSelected = false;
+            pc.addToAsset();      
+            system.assertEquals([Select id From Product_Asset__c where Contact__c = :ct.id].size() , 1);
+        Test.stopTest();
+    }
 
-    static testMethod void addToOrderTest(){
+    @IsTest
+    static void addToOrderTest(){
         TestDataCreation.CreateDeliveryTerm();
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
@@ -207,11 +219,11 @@ static{
             Order__c[] ord = [Select id From Order__c where Case_Account__c = :newacc.id];
             
             system.assertEquals(ord.size() , 1);
-            //system.assertEquals([Select id From Order_Line__c where Order__c = :ord[0].id].size() , 1);
         Test.stopTest();
     }
 
-    static testMethod void searchProdTest(){
+    @IsTest
+    static void searchProdTest(){
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
             Test.setcurrentPage(pr);
@@ -227,7 +239,8 @@ static{
         Test.stopTest();
     }
 
-    static testMethod void selectProdTest(){
+    @IsTest
+    static void selectProdTest(){
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
             Test.setcurrentPage(pr);
@@ -241,7 +254,8 @@ static{
         Test.stopTest();
     }
 
-    static testMethod void selectProdRevisionTest(){
+    @IsTest
+    static void selectProdRevisionTest(){
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
             Test.setcurrentPage(pr);
@@ -253,7 +267,8 @@ static{
         Test.stopTest();
     }
 
-    static testMethod void selectRevsionTest(){
+    @IsTest
+    static void selectRevsionTest(){
         Test.startTest();
             PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
             Test.setcurrentPage(pr);
@@ -266,7 +281,8 @@ static{
         Test.stopTest();
     }
 
-    static testMethod void qtyCalloutTest(){
+    @IsTest
+    static void qtyCalloutTest(){
         Test.startTest();
             
             Application_Config__c QuantityRequestURL = new Application_Config__c(Name='QuantityRequestURL', Value__c = 'http://185.13.140.5:59080/fndext/soapgateway');
@@ -281,53 +297,8 @@ static{
             pc.selectRevsion();
             pc.SelectedProd = newprod;
             pc.qtyCallout();
-            //system.assertEquals();
+            System.assert(!pc.displayRetrievingQuantity, '');
         Test.stopTest();
     }
-
-/*
-    static testMethod void buildTreeTest(){
-        Test.startTest();
-            PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
-            Test.setcurrentPage(pr);
-            PartsCatalogue pc = new PartsCatalogue();
-            pc.buildTree();
-            system.assertEquals();
-        Test.stopTest();
-    }
-    
-
-    
-
-    static testMethod void retrievingQtyTest(){
-        Test.startTest();
-            PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
-            Test.setcurrentPage(pr);
-            PartsCatalogue pc = new PartsCatalogue();
-            pc.retrievingQty();
-            system.assertEquals();
-        Test.stopTest();
-    }
-
-    static testMethod void Test(){
-        Test.startTest();
-            PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
-            Test.setcurrentPage(pr);
-            PartsCatalogue pc = new PartsCatalogue();
-            pc.addToCollection();
-            system.assertEquals();
-        Test.stopTest();
-    }
-
-    static testMethod void Test(){
-        Test.startTest();
-            PageReference pr = new PageReference('/apex/PartsCatalogue?id=' + cs.id);
-            Test.setcurrentPage(pr);
-            PartsCatalogue pc = new PartsCatalogue();
-            pc.addToCollection();
-            system.assertEquals();
-        Test.stopTest();
-    }
-
-*/  
+  
 }

@@ -5,9 +5,18 @@ private class IncidentUpdateApproverTest {
     {
         Id managerID;
         Id delegateID;
+
+        User userManager = DataFactory.createAdminUser('musername@testuser.bristan.com');
+        insert userManager;
+        User userApprover = DataFactory.createAdminUser('ausername@testuser.bristan.com');
+        insert userApprover;
+        User user = DataFactory.createAdminUser('uusername@testuser.bristan.com');
+        user.RF_Manager__c = userManager.Id;
+        user.RF_Delegated_Approver__c = userApprover.Id;
+        insert user;
         
         // Select users for the test.
-        List<User> users = [SELECT Id, RF_Manager__c, RF_Delegated_Approver__c FROM User WHERE Id = '005D00000023kN3' LIMIT 1];
+        List<User> users = [SELECT Id, RF_Manager__c, RF_Delegated_Approver__c FROM User WHERE Id = :user.Id LIMIT 1];
         Id User1Id = users[0].Id;
         // Get manager ID from user record
         managerID = users[0].RF_Manager__c;

@@ -104,7 +104,7 @@ public class ServiceAppointmentGenerateStartEnd Implements Schedulable {
                 return;
             }
         } catch(exception e) {
-            system.debug('******ERROR GENERATING DAY START/ENDS: ' + e);
+            system.debug('******ERROR GENERATING DAY START/ENDS: ' + e.getStackTraceString());
             return;
         }
     }
