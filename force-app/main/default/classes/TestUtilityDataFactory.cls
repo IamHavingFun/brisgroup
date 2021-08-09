@@ -331,4 +331,61 @@ public with sharing class TestUtilityDataFactory {
                 Estimated_Completion__c = Date.today().addDays(60),
                 Initiated_By__c = 'Bristan');
     }
+
+    /**
+     * @return  `BMCServiceDesk__Incident__c`
+     */
+    public static BMCServiceDesk__Incident__c createIncidentRecord(String userId, String supId, String manId) {
+        BMCServiceDesk__BMC_BaseElement__c bs = DataFactory.createBS('TestBS');
+        insert bs;
+        BMCServiceDesk__Impact__c impact = DataFactory.createImpact('TestImpact', false);
+        insert impact;
+        BMCServiceDesk__Urgency__c urgency = DataFactory.createUrgency('Low', false);
+        insert urgency;
+        BMCServiceDesk__Status__c status = DataFactory.createStatus('New', false, true);
+        insert status;
+        BMCServiceDesk__Priority__c priority = DataFactory.createPriority('1', impact, urgency);
+        insert priority;
+
+        return new BMCServiceDesk__Incident__c(
+            RF_Manager__c = supId,
+            RF_Delegated_Approver__c = manId,
+            BMCServiceDesk__FKClient__c = userId,
+            BMCServiceDesk__incidentDescription__c = 'Test',
+            BMCServiceDesk__FKBusinessService__c = bs.Id,
+            BMCServiceDesk__FKImpact__c = impact.Id ,
+            BMCServiceDesk__FKUrgency__c = urgency.Id,
+            BMCServiceDesk__FKStatus__c = status.Id,
+            BMCServiceDesk__FKPriority__c = priority.Id
+        );
+    }
+
+    /**
+     * @return  `BMCServiceDesk__Change_Request__c`
+     */
+    public static BMCServiceDesk__Change_Request__c createChangeRequestRecord(String userId) {
+        BMCServiceDesk__BMC_BaseElement__c bs = DataFactory.createBS('TestBS');
+        insert bs;
+        BMCServiceDesk__Impact__c impact = DataFactory.createImpact('TestImpact', false);
+        insert impact;
+        BMCServiceDesk__Urgency__c urgency = DataFactory.createUrgency('Low', false);
+        insert urgency;
+        BMCServiceDesk__Status__c status = DataFactory.createStatus('New', false, true);
+        insert status;
+        BMCServiceDesk__Priority__c priority = DataFactory.createPriority('1', impact, urgency);
+        insert priority;
+
+        return new BMCServiceDesk__Change_Request__c(
+            BMCServiceDesk__FKInitiator__c = userId,
+            BMCServiceDesk__FKImpact__c = impact.id ,
+            BMCServiceDesk__FKUrgency__c = urgency.id,
+            BMCServiceDesk__FKStatus__c = status.id,
+            BMCServiceDesk__FKPriority__c = priority.id,
+            BMCServiceDesk__Back_out_Plan_Details__c  = '12345678910',
+            BMCServiceDesk__Change_Description__c  = '12345678910',
+            BMCServiceDesk__Reason_for_Change_Details__c = '12345678910',
+            BMCServiceDesk__Roll_Out_Plan_Details__c = '12345678910',
+            CR_Test_Plan_Details__c = '12345678910'
+        );
+    }    
 }

@@ -46,7 +46,7 @@ public with sharing class CaseTriggerTest {
         }
         Test.stopTest();
         Case testCase = [SELECT Closed_By__c, Closed_by_SFID__c FROM Case WHERE Id = :caseId];
-        System.assertEquals('ADM', testCase.Closed_By__c, 'Name doesn\'t match');
+        System.assertEquals('ADM ADM', testCase.Closed_By__c, 'Name doesn\'t match');
         System.assertEquals(adminUser.Id, testCase.Closed_by_SFID__c, 'ID doesn\'t match');
     }
 
@@ -64,7 +64,7 @@ public with sharing class CaseTriggerTest {
         }
         Test.stopTest();
         testCase = [SELECT Closed_By__c, Closed_by_SFID__c FROM Case WHERE Id = :testCase.Id];
-        System.assertEquals('ADM', testCase.Closed_By__c, 'Name doesn\'t match');
+        System.assertEquals('ADM ADM', testCase.Closed_By__c, 'Name doesn\'t match');
         System.assertEquals(adminUser.Id, testCase.Closed_by_SFID__c, 'ID doesn\'t match');
     }
 

@@ -12,13 +12,13 @@ public with sharing class CardPaymentTriggerHandler {
          
         // Service User, Engineer User, Heritage User, Service Back Office User, Service Knowledge Contributor
          
-        system.debug('#### userinfo.getProfileId()  =' + userinfo.getProfileId() );
+        String userProfileId = userinfo.getProfileId();
         for(Income_Card_Payment__c thiscardpayment :records) 
         {
             for (Profile thisprof : serviceuser)
             {
                 system.debug('#### thisprof  =' + thisprof );
-                if (userinfo.getProfileId() == thisprof.id )
+                if (userProfileId == thisprof.id )
                 {
                     system.debug('#### match');
                     thiscardpayment.Payment_Is_From_Console_View__c = true;
