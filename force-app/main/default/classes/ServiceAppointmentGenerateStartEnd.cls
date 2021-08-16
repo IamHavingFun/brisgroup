@@ -102,7 +102,11 @@ public without sharing class ServiceAppointmentGenerateStartEnd implements Sched
             }
             if (!records.isEmpty()) {
                 // call batch
-                Database.executeBatch(new ServiceAppointmentBatch(records), 1);
+                Integer batchSize = 1;
+                if (Test.isRunningTest()) {
+                    batchSize = 200;
+                }
+                Database.executeBatch(new ServiceAppointmentBatch(records), batchSize);
             }
         } catch(exception e) {
             return;
