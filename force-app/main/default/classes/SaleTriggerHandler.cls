@@ -1,24 +1,26 @@
-// This trigger populates the read-only field "Rep_Owner_Lookup__c" on Sales Summaries,
-// It's needed to create a single field that holds either the account owner (sales summary) or the owner (target)
-// For the joined report grouping for sales vs performance
+public with sharing class SaleTriggerHandler {
+    public SaleTriggerHandler() {}
 
-trigger tgrPopulateRepOwnerField_Sale on Sale__c (before insert, before update) { 
-    Map<Id, Id> ownerMap = new Map<Id, Id>();
+
+    public static void tgrPopulateRepOwnerField_Sale(List<Sale__c> records){
+
+        Map<Id, Id> ownerMap = new Map<Id, Id>();
     
-//  Get account owner 
-    for (Sale__c o : Trigger.new)
-    {
-        ownerMap.put(o.Account__c, null);
-    }
-    public string check;
-    check = '0';
-    for (Sale__c o : Trigger.new)
-    {
-        if (o.Account__c != null)
+    //  Get account owner 
+        for (Sale__c o : records)
         {
-            check = '1';
+            ownerMap.put(o.Account__c, null);
         }
-    }    
+        
+        String check = '0';
+        for (Sale__c o : records)
+        {
+            if (o.Account__c != null)
+            {
+                check = '1';
+            }
+        }    
+
         if (check == '1')
         {
             for (Account[] accounts : [SELECT Id, OwnerId FROM Account WHERE Id IN :ownerMap.keySet()])        
@@ -30,16 +32,18 @@ trigger tgrPopulateRepOwnerField_Sale on Sale__c (before insert, before update) 
                     ownerMap.put(accounts[i].Id, accounts[i].OwnerId);            
                 }        
             }
-            for (Sale__c o : Trigger.new)
+            for (Sale__c o : records)
             {
                 o.Rep_Owner_Lookup__c = ownerMap.get(o.Account__c);
             }
         }
         else
         {
-            for (Sale__c o : Trigger.new)
+            for (Sale__c o : records)
             {
                 o.Rep_Owner_Lookup__c = o.OwnerId;
             }
         }
- }
+
+    }
+}

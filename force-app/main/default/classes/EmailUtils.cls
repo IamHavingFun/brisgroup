@@ -1,4 +1,4 @@
-global class EmailUtils {
+global with sharing class EmailUtils {
     
     global static void sendEmailWithStandardAttachments(List<String> recipients,String emailSubject,String body,Boolean useHTML,List<Id> attachmentIDs) {
         List<Attachment> stdAttachments = [SELECT id, name, body FROM Attachment WHERE Id IN:attachmentIDs];

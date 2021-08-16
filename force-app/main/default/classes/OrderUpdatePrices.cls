@@ -7,7 +7,7 @@
  * E-mail - smason@bristan.com
  */
  
-global class OrderUpdatePrices{
+global with sharing class OrderUpdatePrices{
     //List to hold all the Order_Line__c items related to an Order__c
     public List<Order_Line__c> masterList = new List<Order_Line__c>();
     //List to hold Order_Line__c items from masterList depending upon which site they belong

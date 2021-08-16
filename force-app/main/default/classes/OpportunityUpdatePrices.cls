@@ -7,7 +7,7 @@
  * E-mail - badhikari@innoveer.com
  */
  
-global class OpportunityUpdatePrices{
+global with sharing class OpportunityUpdatePrices{
     //List to hold all the OpportunityLineItems related to an Opportunity
     public List<OpportunityLineItem> masterList = new List<OpportunityLineItem>();
     //List to hold OpportunityLineItems from masterList depending upon which site they belong
@@ -45,7 +45,7 @@ global class OpportunityUpdatePrices{
         cusNo = [Select id, name, Account.AccountNumber from Opportunity where id=:oppid].Account.AccountNumber;
         marNo = [Select id, name, MarketingAccNum__c from Opportunity where id=:oppid].MarketingAccNum__c;
         custType = [Select id, name, AccountType__c from Opportunity where id=:oppid].AccountType__c;
-        if(custType != String.valueOf(DataFactory.getAccountRecordTypeId('Direct')).substring(0, 15))
+        if(custType != '012D0000000708V')
         {
             cusNo = marNo;
         }

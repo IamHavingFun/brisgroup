@@ -1,5 +1,10 @@
-@isTest(SeeAllData = true)
+@isTest (SeeAllData = True)
 private class tstQuoteApplyDiscounts {
+
+//    @TestSetup
+//    static void initData() {
+//        TestUtilityClass.setUpData();
+//    }
 
 
     static testMethod void test() {
@@ -9,6 +14,7 @@ private class tstQuoteApplyDiscounts {
         Opportunity op = TestUtilityClass.opp;
         QuoteApplyDiscounts qad = new QuoteApplyDiscounts();
 
+        Test.startTest();
         qad.createLists(qt.id);
         qad.masterList[0].IFS_Price__c = 100;
         qad.masterList[0].UnitPrice = 100;
@@ -30,6 +36,7 @@ private class tstQuoteApplyDiscounts {
             hasException = true;
         }
         system.assertNotEquals(null, hasException, 'expected exception');
+        Test.stopTest();
     }
 
 }

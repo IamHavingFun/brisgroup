@@ -7,7 +7,7 @@
  * E-mail - smason@bristan.com
  */
  
-global class CorrUpdatePrices{
+global with sharing class CorrUpdatePrices{
     //List to hold all the Order_Line__c items related to a Correspondence__c
     public List<Price_Enquiry_Line__c> masterList = new List<Price_Enquiry_Line__c>();
     //List to hold Price_Enquiry_Line__c items from masterList depending upon which site they belong

@@ -5,7 +5,7 @@
  * E-mail - smason@bristan.com
  */
 
-global class QuoteUpdateFuturePrices{
+global with sharing class QuoteUpdateFuturePrices{
     public List<QuoteLineItem> masterList = new List<QuoteLineItem>();
     Public String cusNo;
     Public double price;

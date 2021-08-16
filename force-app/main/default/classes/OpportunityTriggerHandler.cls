@@ -15,7 +15,7 @@ public with sharing class OpportunityTriggerHandler {
         // All Project Ids
         List<String> projectIds = getAllProjectIds(records);
         // returns an Opportunity record given an ID
-        Map<String, Opportunity> projects = new Map<String, Opportunity>([SELECT id, Name, Notes__c, Notes_Rollup__c, Record_Type_Name__c FROM Opportunity WHERE Id IN :projectIds]);
+        Map<String, Opportunity> projects = new Map<String, Opportunity>([SELECT id, Name, Notes__c, Notes_Rollup__c, Record_Type_Name__c FROM Opportunity WHERE Id IN :projectIds FOR UPDATE]);
         // returns an List of Opportunity records given an ID
         Map<String, List<Opportunity>> opportunitiesByProject = getOpportunitiesByProjectId(projectIds);
     
@@ -75,7 +75,9 @@ public with sharing class OpportunityTriggerHandler {
      */
     private static Map<String, List<Opportunity>> getOpportunitiesByProjectId(List<String> projectIds) {
         Map<String, List<Opportunity>> opportunitiesByProject = new Map<String, List<Opportunity>>();
-        for (Opportunity opp : [SELECT Id, Name, Notes__c, Project__c FROM Opportunity WHERE Project__c IN :projectIds]) {
+
+        List<Opportunity> oppList = [SELECT Id, Name, Notes__c, Project__c FROM Opportunity WHERE Project__c IN :projectIds AND LastModifiedDate >= THIS_YEAR LIMIT 40000];
+        for (Opportunity opp : oppList) {
             if (opportunitiesByProject.containsKey(opp.Project__c)) {
                 // If project Id has a list linked to it, get it, add a new element and update the map's entry
                 List<Opportunity> opps = opportunitiesByProject.get(opp.Project__c);

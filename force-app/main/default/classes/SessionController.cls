@@ -1,4 +1,4 @@
-public class SessionController {
+public with sharing class SessionController {
 
     @AuraEnabled
     public static User getUserDetails() {

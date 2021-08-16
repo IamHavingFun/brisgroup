@@ -10,6 +10,9 @@ private class TestCorrUpdatePricesLE {
     static testMethod void CorrPriceUpdateUnitTest() {
         //Set up test data  
         TestUtilityClass.setUpData();
+
+        Test.startTest(); 
+
         //Getting opportunity information
         Correspondence__c ordr = TestUtilityClass.corr;
         //Creating Different Price maps       
@@ -39,6 +42,8 @@ private class TestCorrUpdatePricesLE {
         Integer lines = CorrUpdatePricesLE.getLineCount(ordr.Id);
         Boolean q1 = CorrUpdatePricesLE.createList(ordr.Id);
         //Boolean q2 = CorrUpdatePricesLE.createList(ordr.Id);
+
+        Test.stopTest();
         
         //Looping through each line item to check prices has been updated
         for(Price_Enquiry_Line__c o: oli){

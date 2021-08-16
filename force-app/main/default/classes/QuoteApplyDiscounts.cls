@@ -7,7 +7,7 @@
  * E-mail - smason@bristan.com
  */
 
-global class QuoteApplyDiscounts{
+global with sharing class QuoteApplyDiscounts{
     //List to hold all the QuoteLineItems related to an Quote
     public List<QuoteLineItem> masterList = new List<QuoteLineItem>();
     public decimal disc;

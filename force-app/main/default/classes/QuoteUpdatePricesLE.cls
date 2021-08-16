@@ -8,7 +8,7 @@
  * Updated for Lightning - June 2021 - smason@bristan.com
  */
 
-global class QuoteUpdatePricesLE{
+global with sharing class QuoteUpdatePricesLE{
     //List to hold all the QuoteLineItems related to an Quote
     public List<QuoteLineItem> masterList = new List<QuoteLineItem>();
     //List to hold QuoteLineItems from masterList depending upon which site they belong

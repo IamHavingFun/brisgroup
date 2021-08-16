@@ -31,7 +31,9 @@ trigger OpportunityTrigger on Opportunity (before insert, after insert, before u
     if ((Trigger.isAfter && Trigger.isInsert) || (Trigger.isBefore && Trigger.isUpdate)) {
 
          // Rolls up all notes from project Opportunity records
-         OpportunityTriggerHandler.updateNoteOnProjects(Trigger.new);
+         //Trigger disabled
+         
+        //  OpportunityTriggerHandler.updateNoteOnProjects(Trigger.new);
     }
 
 

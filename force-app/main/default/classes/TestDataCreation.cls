@@ -1,4 +1,4 @@
-public class TestDataCreation {
+public without sharing class TestDataCreation {
 
 public static Account CreateAccount(String accName){
     Account newacc = new Account(Name = accName);

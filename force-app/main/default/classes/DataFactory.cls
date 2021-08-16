@@ -105,6 +105,52 @@ global class DataFactory {
         );
 
     }
+    
+    public static void createQuoteWithQuoteLineItems(String quoteName){
+
+        String CURRENCY_ISO_CODE_GBP = ' GBP';
+        String PRODUCT_JBASC ='J BAS C';
+        String PRODUCT_PMBASC = 'PM BAS C';
+
+        List<QuoteLineItem> Qli = new List<QuoteLineItem>();
+        List<Product2> product = new List<Product2>();
+
+        String standardPriceBookId = Test.getStandardPricebookId();
+
+        Account account = DataFactory.createAccount('TestAccount');
+        insert account;
+
+        Opportunity opp = TestUtilityDataFactory.createOpportunity('Project', 'ProOpp', standardPriceBookId);
+        opp.AccountId = account.Id;
+        insert opp;
+
+        Id specialPriceRecordTypeId = [SELECT Id FROM RecordType WHERE Name = 'Special Price' AND SObjectType = 'Quote'][0].Id;
+
+        Quote q = new Quote(
+            Name = quoteName,
+            OpportunityId = opp.Id,
+            RecordTypeId = specialPriceRecordTypeId,
+            Pricebook2Id = standardPriceBookId,
+            Discount_Perc__c = 10,
+            Expiration_Date__c = Date.today().addDays(60));
+        insert q;
+
+        product.add(new Product2(Name = PRODUCT_JBASC, ProductCode = PRODUCT_JBASC, Site__c = '01', IsActive = true));
+        product.add(new Product2(Name = PRODUCT_PMBASC, ProductCode = PRODUCT_PMBASC, Site__c = '01', IsActive = true));
+        insert product;
+
+        List<PriceBookEntry> pbe = new List<PriceBookEntry>();
+        pbe.add(new PriceBookEntry(Product2Id = product[0].id, PriceBook2Id = standardPriceBookId, UnitPrice = 100, IsActive = true, CurrencyIsoCode = CURRENCY_ISO_CODE_GBP));
+        pbe.add(new PriceBookEntry(Product2Id = product[1].id, PriceBook2Id = standardPriceBookId, UnitPrice = 150, IsActive = true, CurrencyIsoCode = CURRENCY_ISO_CODE_GBP));
+        insert pbe;
+      
+        QuoteLineItem qp = new QuoteLineItem(QuoteId = q.id,unitPrice = 105.00,PriceBookEntryId= pbe[0].id,IFS_Price__c=0,Quantity=10);
+        Qli.add(qp);
+        QuoteLineItem qp2 = new QuoteLineItem(QuoteId = q.id,unitPrice = 104.00,PriceBookEntryId= pbe[1].id,IFS_Price__c=0,Quantity=10);
+        Qli.add(qp2);
+        insert Qli;
+
+    }
 
     public static BMCServiceDesk__BMC_BaseElement__c createBS(String name){
         return new BMCServiceDesk__BMC_BaseElement__c(

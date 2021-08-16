@@ -7,7 +7,7 @@
  * E-mail - badhikari@innoveer.com
  */
 
-global class QuoteUpdatePrices{
+global with sharing class QuoteUpdatePrices{
     //List to hold all the QuoteLineItems related to an Quote
     public List<QuoteLineItem> masterList = new List<QuoteLineItem>();
     //List to hold QuoteLineItems from masterList depending upon which site they belong

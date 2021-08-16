@@ -10,6 +10,9 @@ private class TestOpportunityProductPriceUpdate {
     static testMethod void OppPriceUpdateUnitTest() {
         //Set up test data  
         TestUtilityClass.setUpData();
+
+        Test.startTest(); 
+
         //Getting opportunity information
         Opportunity oppty = TestUtilityClass.opp;
         //Creating Different Price maps       
@@ -41,7 +44,9 @@ private class TestOpportunityProductPriceUpdate {
         
         //Getting the Opportunity Line Items to verify prices have been updated
         List<OpportunityLineItem> oli = [SELECT Id,IFS_Price__c,PriceBookEntry.Product2.Name,PriceBookEntry.Product2.Site__c,OpportunityId FROM OpportunityLineItem WHERE OpportunityId =: oppty.Id];
-        
+
+        Test.stopTest();
+
         //Looping through each line item to check prices has been updated
         for(OpportunityLineItem o: oli){
             system.assertEquals(o.IFS_Price__c, decimal.valueOf(sites.get(o.PriceBookEntry.Product2.Site__c).get(o.PriceBookEntry.Product2.Name)));

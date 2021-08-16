@@ -10,6 +10,8 @@ private class TestStaffSaleUpdatePrices {
     static testMethod void StaffSalePriceUpdateUnitTest() {
         //Set up test data  
         TestUtilityClass.setUpData();
+
+        Test.startTest();
         //Getting opportunity information
         Staff_Sale__c ordr = TestUtilityClass.ss;
         Staff_Sale__c ordr2 = TestUtilityClass.ss2;      
@@ -49,7 +51,9 @@ private class TestStaffSaleUpdatePrices {
         
         //Getting the Opportunity Line Items to verify prices have been updated
         List<Staff_Sale_Line__c> oli = [SELECT Id,Customer_Price__c,Product__r.Name,Product__r.Site__c,Staff_Sale__c FROM Staff_Sale_Line__c WHERE Staff_Sale__c =: ordr.Id];
-        
+
+        Test.stopTest();
+
         //Looping through each line item to check prices has been updated
         for(Staff_Sale_Line__c o: oli){
           system.assertEquals(o.Customer_Price__c, decimal.valueOf(sites.get(o.Product__r.Site__c).get(o.Product__r.Name))*1.2);

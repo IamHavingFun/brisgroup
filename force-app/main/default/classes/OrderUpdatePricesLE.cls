@@ -9,7 +9,7 @@
  * Updated October 2019 to be Lightning compatible (via VF page)
  */
  
-global class OrderUpdatePricesLE{
+global with sharing class OrderUpdatePricesLE{
     //List to hold all the Order_Line__c items related to an Order__c
     public List<Order_Line__c> masterList = new List<Order_Line__c>();
     //List to hold Order_Line__c items from masterList depending upon which site they belong

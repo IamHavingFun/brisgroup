@@ -10,6 +10,8 @@ private class TestCorrUpdatePrices {
     static testMethod void CorrPriceUpdateUnitTest() {
         //Set up test data  
         TestUtilityClass.setUpData();
+
+        Test.startTest();
         //Getting opportunity information
         Correspondence__c ordr = TestUtilityClass.corr;
         //Creating Different Price maps       
@@ -41,7 +43,9 @@ private class TestCorrUpdatePrices {
         
         //Getting the Opportunity Line Items to verify prices have been updated
         List<Price_Enquiry_Line__c> oli = [SELECT Id,Customer_Price__c,Product__r.Name,Product__r.Site__c,Correspondence__c FROM Price_Enquiry_Line__c WHERE Correspondence__c =: ordr.Id];
-        
+
+        Test.stopTest();
+
         //Looping through each line item to check prices has been updated
         for(Price_Enquiry_Line__c o: oli){
           system.assertEquals(o.Customer_Price__c, decimal.valueOf(sites.get(o.Product__r.Site__c).get(o.Product__r.Name)));

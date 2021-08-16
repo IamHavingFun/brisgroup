@@ -1,4 +1,4 @@
-public class LCC_JSMQueryResultService {
+public with sharing class LCC_JSMQueryResultService {
     
     @AuraEnabled
     public static List<sObject> executeQuery(String theQuery){

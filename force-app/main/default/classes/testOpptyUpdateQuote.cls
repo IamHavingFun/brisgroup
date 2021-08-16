@@ -7,8 +7,12 @@ private class testOpptyUpdateQuote{
 
     static testmethod void testOpptyUpdateQuote1()
     {
-        list<Quote> qu=new list<Quote>();
+
         TestUtilityClass.setUpData();
+
+        Test.startTest();
+
+        list<Quote> qu=new list<Quote>();
         Opportunity opty1 = TestUtilityClass.opp; // Creating opportunity record
 
         schema.describesobjectresult resultQuote = Quote.sobjecttype.getdescribe();
@@ -44,6 +48,8 @@ private class testOpptyUpdateQuote{
        }
       UPDATE qu;//Updating Quotes       
        opty1= [SELECT StageName FROM Opportunity  WHERE Id = :opty1.Id];
+
+        Test.stopTest();
 
        System.assertEquals('Order - Won', opty1.StageName );
    }

@@ -10,6 +10,9 @@ private class TestOrderUpdatePrices {
     static testMethod void OrderPriceUpdateUnitTest() {
         //Set up test data  
         TestUtilityClass.setUpData();
+
+        Test.startTest();
+
         //Getting opportunity information
         Order__c ordr = TestUtilityClass.ord;
         Order__c ordr2 = TestUtilityClass.ord2;
@@ -52,6 +55,9 @@ private class TestOrderUpdatePrices {
         Integer lines = OrderUpdatePrices.getLineCount(ordr.Id);
         Boolean o1 = OrderUpdatePrices.createList(ordr.Id);
         Boolean o2 = OrderUpdatePrices.createList(ordr2.Id);
+
+        Test.stopTest();
+
         //Looping through each line item to check prices has been updated
         for(Order_Line__c o: oli){
           system.assertEquals(o.Customer_Price__c, decimal.valueOf(sites.get(o.Product__r.Site__c).get(o.Product__r.Name)));

@@ -387,5 +387,24 @@ public with sharing class TestUtilityDataFactory {
             BMCServiceDesk__Roll_Out_Plan_Details__c = '12345678910',
             CR_Test_Plan_Details__c = '12345678910'
         );
-    }    
+    } 
+    
+    
+    /**
+     * 
+     * @param name
+     * @param pricebookId 
+     * @return  `Quote`
+     */
+    public static Quote createQuote(String name, String pricebookId) {
+        Id specialPriceRecordTypeId = [SELECT Id FROM RecordType WHERE Name = 'Special Price' AND SObjectType = 'Quote'][0].Id;
+        return new Quote(
+            Name = name,
+            RecordTypeId = specialPriceRecordTypeId,
+            Pricebook2Id = pricebookId,
+            Discount_Perc__c = 10,
+            Expiration_Date__c = Date.today().addDays(60));
+    }
+
+
 }

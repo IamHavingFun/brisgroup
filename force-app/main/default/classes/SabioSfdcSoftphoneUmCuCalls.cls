@@ -1,4 +1,4 @@
-global class SabioSfdcSoftphoneUmCuCalls {
+global with sharing class SabioSfdcSoftphoneUmCuCalls {
     webService static String getCalls() {
         String output = null;
         

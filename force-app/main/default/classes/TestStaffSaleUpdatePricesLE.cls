@@ -11,6 +11,9 @@ private class TestStaffSaleUpdatePricesLE {
         //Set up test data  
         TestUtilityClass.setUpData();
         //Getting opportunity information
+
+        Test.startTest();
+
         Staff_Sale__c ordr = TestUtilityClass.ss;
         Staff_Sale__c ordr2 = TestUtilityClass.ss2;      
         //Creating a map that stores Site and its corresponding product information
@@ -27,6 +30,8 @@ private class TestStaffSaleUpdatePricesLE {
         prices4.put('HY PUMP7015','145.50');
         sites.put('04',prices4);
         system.debug('*****sitesss' + sites);
+
+
         
         //Creating an instance of  OrderUpdatePrices class
         StaffSalesUpdatePricesLE oup = new StaffSalesUpdatePricesLE();
@@ -52,6 +57,8 @@ private class TestStaffSaleUpdatePricesLE {
         Integer lines = StaffSalesUpdatePricesLE.getLineCount(ordr.Id);
         Boolean o1 = StaffSalesUpdatePricesLE.createList(ordr.Id);
         Boolean o2 = StaffSalesUpdatePricesLE.createList(ordr2.Id);
+
+        Test.stopTest();
         
         //Looping through each line item to check prices has been updated
         for(Staff_Sale_Line__c o: oli){

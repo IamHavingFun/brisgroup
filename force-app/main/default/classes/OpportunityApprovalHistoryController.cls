@@ -1,4 +1,4 @@
-public class OpportunityApprovalHistoryController {
+public with sharing class OpportunityApprovalHistoryController {
     public String opportunityId{get;set;}
     public List<ProcessInstanceHistory> getApprovalSteps() {
       if (opportunityId!= null) {

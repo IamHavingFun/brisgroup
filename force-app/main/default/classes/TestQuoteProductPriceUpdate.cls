@@ -9,6 +9,9 @@ private class TestQuoteProductPriceUpdate {
     static testMethod void QuotePriceUpdateUnitTest() {
         //setting up the required data
         TestUtilityClass.setUpData();
+
+        Test.startTest();
+
         //Getting the Quote information
         Quote quote = TestUtilityClass.q;
         
@@ -39,7 +42,9 @@ private class TestQuoteProductPriceUpdate {
         
         //Getting the Quote Line Items to verify prices have been updated
         List<QuoteLineItem> qli = [SELECT Id,IFS_Price__c,PriceBookEntry.Product2.Name,PriceBookEntry.Product2.Site__c,QuoteId FROM QuoteLineItem WHERE QuoteId =: quote.Id];
-        
+
+        Test.stopTest();
+
         //Looping through each line item to check prices has been updated
         for(QuoteLineItem q: qli){
           system.assertEquals(q.IFS_Price__c, decimal.valueOf(sites.get(q.PriceBookEntry.Product2.Site__c).get(q.PriceBookEntry.Product2.Name)));

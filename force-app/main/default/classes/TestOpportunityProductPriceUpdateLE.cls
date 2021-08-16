@@ -10,6 +10,9 @@ private class TestOpportunityProductPriceUpdateLE {
     static testMethod void OppPriceUpdateUnitTest() {
         //Set up test data  
         TestUtilityClass.setUpData();
+
+        Test.startTest();
+
         //Getting opportunity information
         Opportunity oppty = TestUtilityClass.opp;
         //Creating Different Price maps       
@@ -44,6 +47,8 @@ private class TestOpportunityProductPriceUpdateLE {
         
         Integer lines = OpportunityUpdatePricesLE.getLineCount(oppty.Id);
         Boolean q1 = OpportunityUpdatePricesLE.createList(oppty.Id);
+
+        Test.stopTest();
         
         //Looping through each line item to check prices has been updated
         for(OpportunityLineItem o: oli){
